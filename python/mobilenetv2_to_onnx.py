@@ -40,14 +40,14 @@ def export_to_onnx():
 
     models_dir = Path.cwd() / "models"
     models_dir.mkdir(exist_ok=True)
-    onnx_file = models_dir / "mobilenetv2_features.onnx"
+    onnx_path = models_dir / "mobilenetv2_features.onnx"
 
     # Export the model to ONNX
     with torch.no_grad():
         torch.onnx.export(
             model,
             sample_inputs,
-            onnx_file,
+            onnx_path,
             #opset_version = 12,
             input_names = ["input"],
             output_names = ["features"],
@@ -55,7 +55,7 @@ def export_to_onnx():
             dynamic_shapes = None   # Fixed the model to same shapes
         )
 
-    print("Model file are exported here: ", onnx_file.resolve())
+    print("-I- Model file is exported here: ", onnx_path.resolve())
 
 
 if __name__ == "__main__":
