@@ -4,13 +4,13 @@ import numpy as np
 from rknn.api import RKNN
 from pathlib import Path
 
-ONNX_MODEL_PATH = 'models/mobilenetv2_features.onnx'
-RKNN_MODEL_PATH = 'models/mobilenetv2_features.rknn'
-IMG_PATH = 'testing.jpg'
-DATASET_PATH = Path.cwd() / "img_dataset.txt"
-QUANTIZE_ON = True
-IMG_SIZE = 224
-NPU_TARGET = 'rk3588'
+onnx_model_path = 'models/mobilenetv2_features.onnx'
+rknn_model_path = 'models/mobilenetv2_features.rknn'
+img_path = 'testing.jpg'
+dataset_path = Path.cwd() / "img_dataset.txt"
+quantize_on = True
+img_size = 224
+npu_target = 'rk3588'
 
 def convert_to_rknn():
     # Create RKNN object
@@ -22,7 +22,7 @@ def convert_to_rknn():
     rknn.config(
         mean_values=[[123.675, 116.28, 103.53]],    # ImageNet mean (RGB) * 255
         std_values=[[58.395, 57.12, 57.375]],       # ImageNet std (RGB) * 255
-        target_platform=NPU_TARGET,
+        target_platform=npu_target,
         quantized_algorithm='normal',
         quantized_method = 'channel'
     )
@@ -31,7 +31,7 @@ def convert_to_rknn():
 
     # Load ONNX model
     print('-I- Loading model...')
-    ret = rknn.load_onnx(model=ONNX_MODEL_PATH)
+    ret = rknn.load_onnx(model=onnx_model_path)
     if ret != 0:
         raise RuntimeError(f'-E- Failed to load ONNX model: {ret}')
 
@@ -41,8 +41,8 @@ def convert_to_rknn():
     # Build RKNN model for NPU
     print('-I- Building model...')
     ret = rknn.build(
-        do_quantization=QUANTIZE_ON, 
-        dataset=DATASET_PATH
+        do_quantization=quantize_on, 
+        dataset=dataset_path
     )
     if ret != 0:
         raise RuntimeError(f'-E- Failed to build RKNN model: {ret}')
@@ -52,25 +52,25 @@ def convert_to_rknn():
 
     # Export RKNN model
     print('-I- Exporting RKNN model...')
-    ret = rknn.export_rknn(RKNN_MODEL_PATH)
+    ret = rknn.export_rknn(rknn_model_path)
     if ret != 0:
         raise RuntimeError(f'-E- Failed to export RKNN model: {ret}')
 
-    print(f'-I- RKNN model has been exported successfully to: {RKNN_MODEL_PATH.resolve()}')
+    print(f'-I- RKNN model has been exported successfully to: {rknn_model_path.resolve()}')
 
 
     # Initialize the runtime environment
     print('-I- Initialize the runtime environment...')
-    if NPU_TARGET:
-        print(f"Initializing RKNN runtime with target: {NPU_TARGET}")
+    if npu_target:
+        print(f"Initializing RKNN runtime with target: {npu_target}")
         
         ret = rknn.init_runtime(
-            target = NPU_TARGET,
+            target = npu_target,
             perf_debug = True,  # Collect performance/latency info
             eval_mem = True     # Collect memory usage info
         )
     else:
-        print("Initializing RKNN runtime in normal simulator mode")
+        print("-I- Initializing RKNN runtime in normal simulator mode")
         ret = rknn.init_runtime()
     
     if ret != 0:
@@ -90,8 +90,8 @@ def convert_to_rknn():
     print(f"SDK Version: {sdk_version   }")
 
     # Set inputs for model inference
-    input_img = cv2.imread('IMG_PATH')
-    input_img = cv2.resize(input_img, (IMG_SIZE, IMG_SIZE))
+    input_img = cv2.imread('img_path')
+    input_img = cv2.resize(input_img, (img_size, img_size))
     input_img = np.expand_dims(input_img, 0)
 
     # Perform RKNN model inference 
@@ -105,7 +105,7 @@ def convert_to_rknn():
     rknn.accuracy_analysis(
         inputs=[input_img],
         output_dir = Path.cwd() / "quant_acc_analysis" ,
-        target = NPU_TARGET
+        target = npu_target
     )
     print('-I- Quantitative accuracy analysis completed.')
 
