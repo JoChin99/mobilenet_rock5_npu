@@ -5,14 +5,7 @@ import torchvision.models as models
 from pathlib import Path
 from torchvision.models.mobilenetv2 import MobileNet_V2_Weights
 
-
-# Select device for training
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#device = torch.device("cpu") # using CPU only
-print(f"Device: {device}")
-
-
-class MobileNetV2(nn.Module):
+class MobileNetV2Features(nn.Module):
     def __init__(self):
         super().__init__()
 
@@ -25,12 +18,12 @@ class MobileNetV2(nn.Module):
     def forward(self, x):
         x = self.features(x)    # [1, 1280, 7, 7]
         x = self.avgpool(x)     # [1, 1280, 1, 1]
-        x = nn.flatten(x, 1)    # [1, 1280]
+        x = torch.flatten(x, 1)    # [1, 1280]
         return x
 
 
 def export_to_onnx():
-    model = MobileNetV2()
+    model = MobileNetV2Features()
     model.eval()
 
     batch_size = 1
@@ -50,14 +43,24 @@ def export_to_onnx():
             onnx_path,
             #opset_version = 12,
             input_names = ["input"],
-            output_names = ["features"],
-            dynamo = True,
-            dynamic_shapes = None   # Fixed the model to same shapes
+            output_names = ["features"]
         )
 
-    print("-I- Model file is exported here: ", onnx_path.resolve())
+    print("Model file is exported here: ", onnx_path.resolve())
 
+def load_onnx_model():
+    # Load the exported model to verify and check the model
+    onnx_model = onnx.load(onnx_path)
+    
+    try:
+        onnx.checker.check_model(onnx_model)
+    except onnx.checker.ValidationError as e:
+        print('The model is invalid: %s' % e)
+    else:
+        print('The model is valid!')
+              
 
 if __name__ == "__main__":
     export_to_onnx()
+    load_onnx_model()
 
