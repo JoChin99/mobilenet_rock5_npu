@@ -6,7 +6,7 @@ from pathlib import Path
 
 onnx_model_path = 'models/mobilenetv2_features.onnx'
 rknn_model_path = 'models/mobilenetv2_features.rknn'
-img_path = 'testing.jpg'
+img_path = "test/cat.jpg"
 dataset_path = Path.cwd() / "img_dataset.txt"
 quantize_on = True
 img_size = 224
