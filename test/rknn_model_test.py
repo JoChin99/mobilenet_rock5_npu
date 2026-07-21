@@ -9,51 +9,66 @@ from tqdm import tqdm
 rknn_model_path = 'models/mobilenetv2_features.rknn'
 classifier_path = 'models/classifier.pt'
 test_results_path = Path.cwd() / 'test/rknn_test_results'
-img_path = "test/cat.jpg"
+img_dir = Path('data/four-shapes/shapes/')
+#img_path = "test/heart.png"
 img_size = (224, 224)
+classes = ['circle', 'heart', 'star']
+labels = {'circle': 0, 'heart': 1, 'star': 2}
 
 def preprocess_image(img_path):
-    img = cv2.imread(img_path)
+    img = cv2.imread(str(img_path))
     if img is None:
         raise RuntimeError(f"Failed to read image: {img_path}")
     
     img = cv2.resize(img, img_size)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = np.expand_dims(img, 0)
 
     return img
 
-def run_rknn_infer(rknn):
+def load_classifier(classifier_path):
+    # Load classifier
+    classifer_model_file = torch.jit.load(classifier_path)
+    params = list(classifer_model_file.parameters())
+    #classifer_model_file = torch.load(classifier_path)
+    classifier = torch.nn.Sequential(
+        torch.nn.Dropout(0.2),  
+        torch.nn.Linear(1280, 3)
+    )
+    classifier[1].weight.data.copy_(params[0])
+    classifier[1].bias.data.copy_(params[1])
+    classifier.eval()
+
+    return classifier
+
+def run_rknn_infer(rknn_model_path, classifier_path, classifier, rknn):
     tp = 0  # true positive
     fp = 0  # false positive
     gtp = 0  # ground truth positives
     true_count = 0  # total correct
     sample_num = 0
 
-    img_dir = test_results_path
     img_files = [
-        p for p in img_dir.rglob("*")
+        #p for p in img_dir.rglob("*")
+        (p, labels[p.parent.name])
+        for class_name in classes
+        for p in (img_dir / class_name).glob("*")
         if p.suffix.lower() in [".jpg", ".jpeg", ".png"]
     ]
     print(f"Total test images found: {len(img_files)} images")
 
-    # Load classifier
-    classifier = torch.jit.load(classifier_path)
-    classifier.eval()
-
-    for img_path in tqdm(img_files):
+    for img_path, label in tqdm(img_files):
         sample_num += 1
 
-        label = int(img_path.parent.parent.name)
+        #label = int(img_path.parent.parent.name)
 
         input_data = preprocess_image(img_path.as_posix())
         output = rknn.inference(inputs=[input_data])
         features = output[0]                        # shape: (1, 1280)
-        memory_detail = rknn.eval_memory()
-        print(memory_detail)
-        print("Output shape:", features.shape)
+        #print("Output shape:", features.shape)
 
         with torch.no_grad():
-            features_tensor = torch.from_numpy(output[0])
+            features_tensor = torch.from_numpy(features)
             logits = classifier(features_tensor)
             # score = torch.softmax(logits, dim=1)
             pred = torch.argmax(logits, dim=1).item()
@@ -62,12 +77,15 @@ def run_rknn_infer(rknn):
             true_count += 1
 
         if label == 1:
-            gt += 1
+            gtp += 1
             if pred == 1:
                 tp += 1
 
         if label == 0 and pred == 1:
             fp += 1
+
+    memory_detail = rknn.eval_memory()
+    print(memory_detail)
 
     rknn.release()
 
@@ -81,6 +99,8 @@ def run_rknn_infer(rknn):
 
 
 if __name__ == '__main__':
+    classifier = load_classifier(classifier_path)
+
     # Create RKNN object
     rknn = RKNN(verbose=True)
     ret = rknn.load_rknn(rknn_model_path)
@@ -92,7 +112,7 @@ if __name__ == '__main__':
     if ret != 0:
         raise RuntimeError(f'-E- Failed to initialize runtime environment: {ret}')
 
-    run_rknn_infer(rknn_model_path, classifier_path)
+    run_rknn_infer(rknn_model_path, classifier_path, classifier, rknn)
     
 
     

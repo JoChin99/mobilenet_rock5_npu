@@ -1,7 +1,7 @@
 import kagglehub
 from pathlib import Path
 
-kaggle_dataset = "abdalnassir/the-animalist-cat-vs-dog-classification"
+kaggle_dataset = "smeschke/four-shapes"
 dataset_name = kaggle_dataset.split("/")[-1]    # To keep the dataset name 
 save_dataset = Path.cwd() / "data" / dataset_name
 save_dataset.mkdir(parents=True, exist_ok=True)

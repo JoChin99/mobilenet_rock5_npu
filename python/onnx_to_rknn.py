@@ -3,14 +3,48 @@ import numpy as np
 
 from rknn.api import RKNN
 from pathlib import Path
+from tqdm import tqdm
 
 onnx_model_path = 'models/mobilenetv2_features.onnx'
 rknn_model_path = 'models/mobilenetv2_features.rknn'
-img_path = "test/cat.jpg"
-dataset_path = Path.cwd() / "img_dataset.txt"
+img_dir = Path('data/four-shapes/shapes/')
+#img_path = 'test/heart.png'
+dataset_path = 'img_dataset.txt'
 quantize_on = True
-img_size = 224
+img_size = (224,224)
 npu_target = 'rk3588'
+class_names = ['circle', 'star', 'heart']
+labels = {'circle':0, 'star':1, 'heart':2}
+
+def preprocess_image(img_path):
+    img = cv2.imread(str(img_path))
+    if img is None:
+        raise RuntimeError(f"Failed to read image: {img_path}")
+    
+    img = cv2.resize(img, img_size)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = np.transpose(img,(2,0,1))
+    img = np.expand_dims(img, 0)
+
+    return img
+
+def load_imgs():
+    images = []
+
+    for class_name in class_names:
+        folder = img_dir / class_name
+
+        for img in folder.glob("*"):
+            if img.suffix.lower() in [
+                ".png",
+                ".jpg",
+                ".jpeg"
+            ]:
+                images.append(
+                    (img, labels[class_name])
+                )
+
+    return images
 
 def convert_to_rknn():
     # Create RKNN object
@@ -24,7 +58,7 @@ def convert_to_rknn():
         std_values=[[58.395, 57.12, 57.375]],       # ImageNet std (RGB) * 255
         target_platform=npu_target,
         quantized_algorithm='normal',
-        quantized_method = 'channel'
+        quantized_method = 'channel',
     )
     print("-I- Model configuration successfully.")
 
@@ -56,7 +90,7 @@ def convert_to_rknn():
     if ret != 0:
         raise RuntimeError(f'-E- Failed to export RKNN model: {ret}')
 
-    print(f'-I- RKNN model has been exported successfully to: {rknn_model_path.resolve()}')
+    print(f'-I- RKNN model has been exported successfully to: {rknn_model_path}')
 
 
     # Initialize the runtime environment
@@ -83,28 +117,35 @@ def convert_to_rknn():
     print("-I- Performance evaluation completed.")
 
     print("-I- Evaluating memory usage...")
-    rknn.eval_mem()
+    rknn.eval_memory()
     print("-I- Memory evaluation completed.")
 
-    sdk_version = rknn.get_sdk_version()
-    print(f"SDK Version: {sdk_version   }")
+    # Load dataset
+    img_data = load_imgs()
+    print(f"Total images: {len(img_data)}")
 
-    # Set inputs for model inference
-    input_img = cv2.imread('img_path')
-    input_img = cv2.resize(input_img, (img_size, img_size))
-    input_img = np.expand_dims(input_img, 0)
-
-    # Perform RKNN model inference 
     print('-I- Running RKNN model inference...')
-    # input_img = np.random.randn(1, 256, 128, 3).astype(np.float32) # For testing RKNN model inference by creating random input image tensor
-    outputs = rknn.inference(inputs=[input_img])
-    print("Outputs Shape: ", outputs.shape)
+    for img_path, label in tqdm(img_data):
+        # Set inputs for model inference
+        input_img = preprocess_image(img_path)
+
+        # Perform RKNN model inference 
+        # input_img = np.random.randn(1, 256, 128, 3).astype(np.float32) # For testing RKNN model inference by creating random input image tensor
+        outputs = rknn.inference(inputs=[input_img])
+        #print("Outputs Shape: ", outputs[0].shape)
+        #print(img_path.name, "feature shape:", outputs[0].shape)
 
     # Quantitative accuracy analysis
+    image_list = []
+
+    for img in img_dir.rglob("*"):
+        if img.suffix.lower() in [".png", ".jpg", ".jpeg"]:
+            image_list.append(str(img))
+
     print('-I- Analysing the accuracy .....')
     rknn.accuracy_analysis(
-        inputs=[input_img],
-        output_dir = Path.cwd() / "quant_acc_analysis" ,
+        inputs=image_list,
+        output_dir = './models/quant_acc_analysis',
         target = npu_target
     )
     print('-I- Quantitative accuracy analysis completed.')

@@ -1,3 +1,4 @@
+import onnx
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -41,14 +42,18 @@ def export_to_onnx():
             model,
             sample_inputs,
             onnx_path,
-            #opset_version = 12,
+            opset_version = 17,
             input_names = ["input"],
             output_names = ["features"]
         )
 
     print("Model file is exported here: ", onnx_path.resolve())
 
+    return onnx_path
+
 def load_onnx_model():
+    onnx_path = export_to_onnx()
+
     # Load the exported model to verify and check the model
     onnx_model = onnx.load(onnx_path)
     
@@ -57,7 +62,7 @@ def load_onnx_model():
     except onnx.checker.ValidationError as e:
         print('The model is invalid: %s' % e)
     else:
-        print('The model is valid!')
+        print('The model is valid.')
               
 
 if __name__ == "__main__":

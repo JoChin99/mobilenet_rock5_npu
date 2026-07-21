@@ -1,0 +1,113 @@
+# simulator_error: calculate the output error of each layer of the simulator (compared to the 'golden' value).
+#              entire: output error of each layer between 'golden' and 'simulator', these errors will accumulate layer by layer.
+#              single: single-layer output error between 'golden' and 'simulator', can better reflect the single-layer accuracy of the simulator.
+# runtime_error: calculate the output error of each layer of the runtime.
+#              entire: output error of each layer between 'golden' and 'runtime', these errors will accumulate layer by layer.
+#              single_sim: single-layer output error between 'simulator' and 'runtime', can better reflect the single-layer accuracy of runtime.
+
+layer_name                                                                   simulator_error                             runtime_error                      
+                                                                         entire              single                  entire           single_sim            
+                                                                      cos      euc        cos      euc            cos      euc        cos      euc          
+----------------------------------------------------------------------------------------------------------------------------------------------------
+[Input] input                                                       1.00000 | 0.0       1.00000 | 0.0           
+[exDataConvert] input_int8                                          0.99998 | 2.8394    0.99998 | 2.8394        
+[Conv] /features/features.0/features.0.0/Conv_output_0              
+[Clip] /features/features.0/features.0.2/Clip_output_0              0.99963 | 44.350    0.99963 | 44.350        0.99963 | 44.279    0.99997 | 6.2295        
+[Conv] /features/features.1/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.1/conv/conv.0/conv.0.2/Clip_output_0      0.99905 | 66.042    0.99922 | 60.712        0.99908 | 65.943    1.00000 | 2.4606        
+[Conv] /features/features.1/conv/conv.1/Conv_output_0               0.98719 | 251.37    0.99804 | 99.494        0.98817 | 240.12    1.00000 | 2.3688        
+[Conv] /features/features.2/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.2/conv/conv.0/conv.0.2/Clip_output_0      0.99340 | 264.14    0.99893 | 109.99        0.99516 | 228.10    1.00000 | 5.6156        
+[Conv] /features/features.2/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.2/conv/conv.1/conv.1.2/Clip_output_0      0.99399 | 95.221    0.99995 | 7.6205        0.99482 | 88.848    1.00000 | 1.7584        
+[Conv] /features/features.2/conv/conv.2/Conv_output_0               0.97800 | 323.21    0.99981 | 30.366        0.98030 | 306.20    1.00000 | 0.9186        
+[Conv] /features/features.3/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.3/conv/conv.0/conv.0.2/Clip_output_0      0.98782 | 176.19    0.99991 | 17.351        0.99074 | 153.97    0.99999 | 2.1476        
+[Conv] /features/features.3/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.3/conv/conv.1/conv.1.2/Clip_output_0      0.99720 | 74.143    0.99995 | 9.0126        0.99743 | 71.005    1.00000 | 1.9347        
+[Conv] /features/features.3/conv/conv.2/Conv_output_0               0.97741 | 260.63    0.99982 | 23.078        
+[Add] /features/features.3/Add_output_0                             0.97754 | 316.80    0.99964 | 40.257        0.98327 | 273.24    1.00000 | 1.9537        
+[Conv] /features/features.4/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.4/conv/conv.0/conv.0.2/Clip_output_0      0.98643 | 137.02    0.99986 | 14.455        0.99063 | 114.04    1.00000 | 0.8228        
+[Conv] /features/features.4/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.4/conv/conv.1/conv.1.2/Clip_output_0      0.98083 | 108.32    0.99999 | 3.5555        0.98452 | 97.403    1.00000 | 1.1153        
+[Conv] /features/features.4/conv/conv.2/Conv_output_0               0.94358 | 310.44    0.99982 | 17.892        0.96440 | 245.27    1.00000 | 0.6271        
+[Conv] /features/features.5/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.5/conv/conv.0/conv.0.2/Clip_output_0      0.98171 | 119.00    0.99995 | 5.9327        0.98600 | 103.26    1.00000 | 0.6339        
+[Conv] /features/features.5/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.5/conv/conv.1/conv.1.2/Clip_output_0      0.98280 | 91.502    0.99998 | 3.5346        0.98707 | 79.190    1.00000 | 0.7631        
+[Conv] /features/features.5/conv/conv.2/Conv_output_0               0.95273 | 210.86    0.99992 | 8.8894        
+[Add] /features/features.5/Add_output_0                             0.94670 | 326.99    0.99978 | 21.303        0.96291 | 273.14    1.00000 | 2.1108        
+[Conv] /features/features.6/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.6/conv/conv.0/conv.0.2/Clip_output_0      0.97932 | 114.43    0.99994 | 6.0962        0.98557 | 95.529    1.00000 | 0.4458        
+[Conv] /features/features.6/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.6/conv/conv.1/conv.1.2/Clip_output_0      0.96313 | 102.13    0.99997 | 2.9867        0.97360 | 86.668    1.00000 | 0.4061        
+[Conv] /features/features.6/conv/conv.2/Conv_output_0               0.92783 | 278.41    0.99994 | 7.4814        
+[Add] /features/features.6/Add_output_0                             0.93227 | 376.03    0.99951 | 32.628        0.94802 | 330.64    1.00000 | 1.5375        
+[Conv] /features/features.7/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.7/conv/conv.0/conv.0.2/Clip_output_0      0.96426 | 73.680    0.99966 | 6.9915        0.97041 | 66.924    1.00000 | 0.5602        
+[Conv] /features/features.7/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.7/conv/conv.1/conv.1.2/Clip_output_0      0.99338 | 54.759    1.00000 | 1.3994        0.99566 | 44.337    1.00000 | 0.3537        
+[Conv] /features/features.7/conv/conv.2/Conv_output_0               0.95521 | 147.76    0.99969 | 12.622        0.96917 | 122.67    1.00000 | 0.6129        
+[Conv] /features/features.8/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.8/conv/conv.0/conv.0.2/Clip_output_0      0.98545 | 60.907    0.99995 | 3.4260        0.98913 | 52.780    1.00000 | 0.3986        
+[Conv] /features/features.8/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.8/conv/conv.1/conv.1.2/Clip_output_0      0.97672 | 49.727    0.99994 | 2.4701        0.98237 | 43.292    1.00000 | 0.3844        
+[Conv] /features/features.8/conv/conv.2/Conv_output_0               0.95087 | 117.39    0.99993 | 4.6063        
+[Add] /features/features.8/Add_output_0                             0.93879 | 180.68    0.99984 | 9.3228        0.96088 | 144.89    1.00000 | 1.2186        
+[Conv] /features/features.9/conv/conv.0/conv.0.0/Conv_output_0      
+[Clip] /features/features.9/conv/conv.0/conv.0.2/Clip_output_0      0.97176 | 71.386    0.99995 | 3.1576        0.97947 | 61.028    1.00000 | 0.3401        
+[Conv] /features/features.9/conv/conv.1/conv.1.0/Conv_output_0      
+[Clip] /features/features.9/conv/conv.1/conv.1.2/Clip_output_0      0.96949 | 59.865    0.99995 | 2.3659        0.97833 | 50.567    1.00000 | 0.4129        
+[Conv] /features/features.9/conv/conv.2/Conv_output_0               0.89342 | 133.06    0.99987 | 4.8244        
+[Add] /features/features.9/Add_output_0                             0.91710 | 215.54    0.99984 | 9.5369        0.95013 | 167.77    1.00000 | 0.5208        
+[Conv] /features/features.10/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.10/conv/conv.0/conv.0.2/Clip_output_0     0.96179 | 68.149    0.99994 | 2.8203        0.97503 | 55.270    1.00000 | 0.2764        
+[Conv] /features/features.10/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.10/conv/conv.1/conv.1.2/Clip_output_0     0.95018 | 73.267    0.99996 | 2.0206        0.96838 | 58.712    1.00000 | 0.5587        
+[Conv] /features/features.10/conv/conv.2/Conv_output_0              0.85197 | 208.94    0.99986 | 6.5529        
+[Add] /features/features.10/Add_output_0                            0.87116 | 293.81    0.99974 | 13.612        0.91918 | 236.50    1.00000 | 1.2726        
+[Conv] /features/features.11/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.11/conv/conv.0/conv.0.2/Clip_output_0     0.95480 | 74.565    0.99985 | 4.1519        0.97079 | 59.413    1.00000 | 0.3368        
+[Conv] /features/features.11/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.11/conv/conv.1/conv.1.2/Clip_output_0     0.98721 | 66.350    0.99999 | 1.9113        0.99179 | 53.207    1.00000 | 0.6900        
+[Conv] /features/features.11/conv/conv.2/Conv_output_0              0.92097 | 148.37    0.99960 | 10.432        0.94884 | 118.64    1.00000 | 0.4329        
+[Conv] /features/features.12/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.12/conv/conv.0/conv.0.2/Clip_output_0     0.96290 | 70.509    0.99990 | 3.7233        0.97659 | 55.733    1.00000 | 0.3837        
+[Conv] /features/features.12/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.12/conv/conv.1/conv.1.2/Clip_output_0     0.97993 | 55.964    0.99997 | 2.2809        0.98717 | 44.671    1.00000 | 0.4544        
+[Conv] /features/features.12/conv/conv.2/Conv_output_0              0.91450 | 107.63    0.99979 | 5.3139        
+[Add] /features/features.12/Add_output_0                            0.92889 | 173.00    0.99976 | 10.015        0.95280 | 140.15    1.00000 | 0.6090        
+[Conv] /features/features.13/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.13/conv/conv.0/conv.0.2/Clip_output_0     0.96186 | 62.735    0.99990 | 3.1942        0.97503 | 50.826    1.00000 | 0.2793        
+[Conv] /features/features.13/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.13/conv/conv.1/conv.1.2/Clip_output_0     0.98897 | 48.612    0.99998 | 1.8550        0.99274 | 39.357    1.00000 | 0.5513        
+[Conv] /features/features.13/conv/conv.2/Conv_output_0              0.89701 | 139.66    0.99963 | 8.3972        
+[Add] /features/features.13/Add_output_0                            0.92031 | 217.50    0.99975 | 12.036        0.94680 | 176.40    1.00000 | 0.6859        
+[Conv] /features/features.14/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.14/conv/conv.0/conv.0.2/Clip_output_0     0.95327 | 48.890    0.99987 | 2.5973        0.96755 | 40.759    1.00000 | 0.2269        
+[Conv] /features/features.14/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.14/conv/conv.1/conv.1.2/Clip_output_0     0.99643 | 27.770    1.00000 | 0.9730        0.99779 | 21.835    1.00000 | 0.3393        
+[Conv] /features/features.14/conv/conv.2/Conv_output_0              0.94084 | 69.507    0.99938 | 7.0304        0.96069 | 56.248    1.00000 | 0.2509        
+[Conv] /features/features.15/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.15/conv/conv.0/conv.0.2/Clip_output_0     0.97826 | 43.005    0.99994 | 2.3542        0.98622 | 34.218    1.00000 | 0.2891        
+[Conv] /features/features.15/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.15/conv/conv.1/conv.1.2/Clip_output_0     0.98275 | 26.522    0.99996 | 1.2942        0.98798 | 22.105    1.00000 | 0.2900        
+[Conv] /features/features.15/conv/conv.2/Conv_output_0              0.94534 | 62.267    0.99979 | 3.8604        
+[Add] /features/features.15/Add_output_0                            0.94307 | 92.466    0.99983 | 5.0632        0.96037 | 76.352    1.00000 | 0.3445        
+[Conv] /features/features.16/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.16/conv/conv.0/conv.0.2/Clip_output_0     0.98282 | 37.537    0.99995 | 2.1130        0.98831 | 30.897    1.00000 | 0.2566        
+[Conv] /features/features.16/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.16/conv/conv.1/conv.1.2/Clip_output_0     0.99276 | 17.881    0.99998 | 0.9883        0.99541 | 14.201    1.00000 | 0.4383        
+[Conv] /features/features.16/conv/conv.2/Conv_output_0              0.88872 | 93.070    0.99934 | 7.0198        
+[Add] /features/features.16/Add_output_0                            0.92618 | 129.60    0.99979 | 6.9110        0.95356 | 101.64    1.00000 | 0.5017        
+[Conv] /features/features.17/conv/conv.0/conv.0.0/Conv_output_0     
+[Clip] /features/features.17/conv/conv.0/conv.0.2/Clip_output_0     0.94583 | 45.057    0.99988 | 2.1901        0.96723 | 35.204    1.00000 | 0.2051        
+[Conv] /features/features.17/conv/conv.1/conv.1.0/Conv_output_0     
+[Clip] /features/features.17/conv/conv.1/conv.1.2/Clip_output_0     0.98531 | 56.615    0.99999 | 1.4484        0.99097 | 44.469    1.00000 | 0.3923        
+[Conv] /features/features.17/conv/conv.2/Conv_output_0              0.88557 | 124.06    0.99948 | 8.4962        0.92758 | 99.175    1.00000 | 0.3582        
+[Conv] /features/features.18/features.18.0/Conv_output_0            
+[Clip] /features/features.18/features.18.2/Clip_output_0            0.87893 | 89.635    0.99984 | 3.1578        0.91798 | 73.437    1.00000 | 0.1310        
+[Conv] /avgpool/GlobalAveragePool_output_0                          0.93339 | 4.5294    0.99993 | 0.1438        0.96124 | 3.4321    1.00000 | 0.0           
+[Reshape] features_int8                                             0.93339 | 4.5294    0.99993 | 0.1435        
+[exDataConvert] features                                            0.93339 | 4.5294    0.99993 | 0.1435        0.96124 | 3.4321    1.00000 | 0.0           
