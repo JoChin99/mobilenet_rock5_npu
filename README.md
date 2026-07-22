@@ -72,6 +72,14 @@ This uses **img_dataset.txt** (list of image paths) as the calibration dataset. 
 ---
 
 ## Calibration
+### Generate Calibration Dataset
+Before running the script, generate a calibration dataset by randomly selecting 3,000 (or any desired number of) images from the dataset. The following command is only **provided as an example**:
+```bash
+ls ~/mobilenet_rock5/data/four-shapes/shapes/{circle,heart,star}/*.png | shuf | head -3000 > img_dataset.txt 
+```
+Modify the dataset path, class names and the number of images as needed for your own dataset.
+
+### Perform Calibration
 Each script targets a different inference backend. Choose any of the following scripts to verify the model, depending on the runtime you wish to use:
 ```bash
 python ./test/onnx_model_test.py
