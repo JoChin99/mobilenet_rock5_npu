@@ -13,7 +13,7 @@ fi
 
 source $ROCK5B_DIR/bin/activate
 pip install --upgrade pip
-pip install -r requirement.txt
+pip install -r requirements.txt
 
 echo "-I- Done"
 echo "-I- The environment can be activated with this command: source $ROCK5B_DIR/bin/activate"
