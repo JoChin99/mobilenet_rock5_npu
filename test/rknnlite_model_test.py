@@ -6,7 +6,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 rknn_model_path = 'models/mobilenetv2_features.rknn'
-img_dir = Path('data/four-shapes/shapes/')
+img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
 #img_path = "~/mobilenet_rock5/test/heart.png"
 img_size = (224,224)
 npu_target = 'rk3588'

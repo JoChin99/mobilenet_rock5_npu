@@ -12,7 +12,7 @@
 namespace fs = std::filesystem;
 
 // Path of the Kaggle dataset
-const fs::path datasetpath = "mobilenet_rock5/data/four-shapes/shapes/";
+const fs::path datasetpath = "mobilenet_rock5/data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/";
 
 // Path of the RKNN model
 const fs::path rknn_model_path  = "mobilenet_rock5/models/mobilenetv2_features.rknn";
@@ -96,8 +96,8 @@ struct MobileNetV2Classifier : torch::nn::Module
         sequ = torch::nn::Sequential(
             torch::nn::Dropout(0.2),
             torch::nn::Linear(nFeatures, nClasses));
-
         register_module(classifierModuleName, sequ);
+
         for (auto &module : sequ->modules(/*include_self=*/false))
         {
             if (auto M = dynamic_cast<torch::nn::LinearImpl *>(module.get()))
@@ -106,6 +106,39 @@ struct MobileNetV2Classifier : torch::nn::Module
                 torch::nn::init::zeros_(M->bias);
             }
         }
+    }
+
+    /** 
+     * @brief Save classifier weights as a pickled key/tensor dict with converter
+     * To solve the difference naming conventions between pytorch and libtorch.
+     * This is to ensure the key/parameters pairs are loaded into named parameters properly.
+    */
+    void save_classifier_weights(const std::string& pt_path)
+    {
+        c10::Dict<std::string, torch::Tensor> weights;
+
+        std::cout << "-I- Saving the parameters from the model: " << "\n";
+        for (const auto &p : sequ->named_parameters())
+        {
+            weights.insert(p.key(), p.value().detach().cpu().contiguous());
+            std::cout << p.key() << " , " << p.value().sizes() << "\n";
+        }
+        /*
+        std::cout << "-I- Saving the parameters named buffers in this model: " << "\n";
+        for (const auto &b : sequ->named_parameters())
+        {
+            weights.insert(b.key(), key.value().detach().cpu());
+            std::cout << b.key() << " , " << b.value().sizes() << "\n";
+        }
+        */
+
+        const std::vector<char> bytes = torch::pickle_save(weights);
+        std::ofstream output(pt_path, std::ios::binary);
+        if (!output)
+            throw std::runtime_error("-E- Failed to open file for writing: " + pt_path);
+        output.write(bytes.data(), bytes.size());
+        output.close();
+        //for (const auto &b : module.named_buffers())
     }
     torch::nn::Sequential sequ{nullptr};
 };
@@ -174,9 +207,10 @@ int main()
         std::cout << std::endl
                   << std::flush;
     }
-    auto params = classifier.named_parameters();
-    torch::save(classifier.sequ, classifier_model_path);
+    //auto params = classifier.named_parameters();
+    //torch::save(classifier.sequ, classifier_model_path);
     //torch::save({params["classifier.1.weight"], params["classifier.1.bias"]}, classifier_model_path);
+    classifier.save_classifier_weights(classifier_model_path);
     std::cout << "Done.\n";
 
     return 0;

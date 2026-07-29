@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 onnx_model_path = 'models/mobilenetv2_features.onnx'
 rknn_model_path = 'models/mobilenetv2_features.rknn'
-img_dir = Path('data/four-shapes/shapes/')
+img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
 #img_path = 'test/heart.png'
 dataset_path = 'img_dataset.txt'
 quantize_on = True

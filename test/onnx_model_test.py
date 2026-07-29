@@ -9,7 +9,7 @@ from pathlib import Path
 onnx_model_path = 'models/mobilenetv2_features.onnx'
 classifier_path = 'models/classifier.pt'
 test_results_path = Path.cwd() / 'test/onnx_test_results'
-img_dir = Path('data/four-shapes/shapes/')
+img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
 #img_path = "./test/heart.png"
 img_size = (224, 224)
 classes = ['circle', 'heart', 'star']
@@ -37,15 +37,23 @@ def preprocess_image(img_paths):
 
 def load_classifier(classifier_path): #, nfeatures=1280, nclasses=3
     # Load classifier
-    classifer_model_file = torch.jit.load(classifier_path)
-    params = list(classifer_model_file.parameters())
-    #classifer_model_file = torch.load(classifier_path)
+    classifer_model_file = torch.load(classifier_path, weights_only=False)
+    if not isinstance(classifer_model_file, dict):
+        raise TypeError(f"-E- Expected dict from {classifier_path}, got {type(classifer_model_file)}")
+
     classifier = torch.nn.Sequential(
         torch.nn.Dropout(0.2),  
         torch.nn.Linear(1280, 3)
     )
-    classifier[1].weight.data.copy_(params[0])
-    classifier[1].bias.data.copy_(params[1])
+
+    with torch.no_grad():
+        for name, tensor in classifer_model_file.items():
+            if name == "1.weight":
+                classifier[1].weight.data.copy_(tensor)
+            elif name == "1.bias":
+                classifier[1].bias.data.copy_(tensor)
+            else:
+                raise RuntimeError(f"-E- Unexpected key '{name}' in classifier weights.")
     classifier.eval()
 
     return classifier
@@ -109,6 +117,9 @@ def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
             logits = classifier(features_tensor)
             # score = torch.softmax(logits, dim=1)
             pred = torch.argmax(logits, dim=1).item()
+
+        if sample_num:
+            print(f"{img_path.name}: true={classes[label]}, pred={classes[pred]}")
 
         if label == pred:
             true_count += 1
