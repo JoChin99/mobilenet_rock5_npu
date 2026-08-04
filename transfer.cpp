@@ -18,7 +18,7 @@ const fs::path datasetpath = "mobilenet_rock5/data/2d-geometric-shapes-17-shapes
 const fs::path rknn_model_path  = "mobilenet_rock5/models/mobilenetv2_features.rknn";
 
 // Path to the classifier file
-const char classifier_model_path[] = "../models/classifier.pt";
+const char classifier_model_path[] = "mobilenet_rock5/models/classifier.pt";
 
 // Path to the loss log file
 const char loss_file[] = "loss.dat";

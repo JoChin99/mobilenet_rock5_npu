@@ -59,9 +59,9 @@ def load_classifier(classifier_path): #, nfeatures=1280, nclasses=3
     return classifier
 
 def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
-    tp = 0  # true positive
-    fp = 0  # false positive
-    gtp = 0  # ground truth positives
+    tp = [0] * len(classes)  # true positive
+    fp = [0] * len(classes)  # false positive
+    gtp = [0] * len(classes)  # ground truth positives
     true_count = 0  # total correct
     sample_num = 0
 
@@ -118,28 +118,40 @@ def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
             # score = torch.softmax(logits, dim=1)
             pred = torch.argmax(logits, dim=1).item()
 
-        if sample_num:
-            print(f"{img_path.name}: true={classes[label]}, pred={classes[pred]}")
+        # Debugging purpose
+        #if sample_num < 15:
+        #    print(f"{img_path.name}: true={classes[label]}, pred={classes[pred]}")
 
         if label == pred:
             true_count += 1
 
-        if label == 1:
-            gtp += 1
-            if pred == 1:
-                tp += 1
+        gtp[label] += 1
+        if pred == label:
+            tp[label] += 1
+        else:
+            fp[pred] += 1
+        #if label == 1:
+        #    gtp += 1
+        #    if pred == 1:
+        #        tp += 1
 
-        if label == 0 and pred == 1:
-            fp += 1
+        #if label == 0 and pred == 1:
+        #    fp += 1
 
     accuracy = true_count / sample_num if sample_num > 0 else 0
-    recall = tp / gtp if gtp > 0 else 0
-    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-
+    ##Uncomment as this is only for one class not multiple classes
+    #recall = tp / gtp if gtp > 0 else 0
+    #precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    #print(f"Recall: {tp} / {gtp} = {recall:.4f}")
+    #print(f"Precision: {tp} / {tp + fp} = {precision:.4f}")
+    
     print(f"Accuracy: {true_count} / {sample_num} = {accuracy:.4f}")
-    print(f"Recall: {tp} / {gtp} = {recall:.4f}")
-    print(f"Precision: {tp} / {tp + fp} = {precision:.4f}")
-
+    print(f"{'Class':<10} {'Recall':>8} {'Precision':>10}")
+    for i, class_label in enumerate(classes):
+        recall = tp[i] / gtp[i] if gtp[i] > 0 else 0
+        precision = tp[i] / (tp[i] + fp[i]) if (tp[i] + fp[i]) > 0 else 0
+        print(f"{class_label:<10} {recall:>8.4f} {precision:>10.4f}")
+        
 
 if __name__ == "__main__":
     classifier = load_classifier(classifier_path)
