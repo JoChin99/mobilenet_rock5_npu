@@ -10,8 +10,8 @@ img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/'
 #img_path = "~/mobilenet_rock5/test/heart.png"
 img_size = (224,224)
 npu_target = 'rk3588'
-class_names = ['circle', 'star', 'heart']
-labels = {'circle':0, 'star':1, 'heart':2}
+class_names = ['circle', 'heart', 'star']
+labels = {'circle':0, 'heart':1, 'star':2}
 
 def preprocess_image(img_path):
     img = cv2.imread(str(img_path))

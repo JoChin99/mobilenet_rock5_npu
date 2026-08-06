@@ -105,6 +105,7 @@ int main()
     {
         //const long current_infer = nInferFrames.fetch_add(1) + 1;
         //const long current_total = nFrames.load();
+        nInferFrames.fetch_add(1);
         total_infer += duration;
 
         /* Avoid spamming the terminal with output messages */ 

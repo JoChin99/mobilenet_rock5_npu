@@ -23,7 +23,7 @@ def preprocess_image(img_path):
     
     img = cv2.resize(img, img_size)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = np.transpose(img,(2,0,1))
+    #img = np.transpose(img,(2,0,1))
     img = np.expand_dims(img, 0)
 
     return img

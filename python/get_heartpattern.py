@@ -7,7 +7,17 @@ heart_data = "heart"
 
 os.makedirs(heart_data, exist_ok=True)
 
+def random_colour():
+    colours = ( 
+        random.randint(0,255),
+        random.randint(0,255),
+        random.randint(0,255)
+    )
+
+    return colours
+
 def draw_heart(path):
+    heart_colour = random_colour()
     img = Image.new("RGB", (224,224), (255,255,255))
     img_draw = ImageDraw.Draw(img)
 
@@ -50,13 +60,13 @@ def draw_heart(path):
 
     img_draw.polygon(
         points,
-        fill="black"
+        fill=heart_colour
     )
 
     img.save(path)
 
 
-for i in range(2000):
+for i in range(50000):
     file_name = f"{i}.png"
 
     file_path = os.path.join(heart_data, file_name)

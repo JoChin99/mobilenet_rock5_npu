@@ -21,19 +21,19 @@ const fs::path rknn_model_path  = "mobilenet_rock5/models/mobilenetv2_features.r
 const char classifier_model_path[] = "mobilenet_rock5/models/classifier.pt";
 
 // Path to the loss log file
-const char loss_file[] = "loss.dat";
+const char loss_file[] = "mobilenet_rock5/models/loss.dat";
 
 // Subdirs of the classes
 const std::vector<fs::path> classes = {"circle", "heart", "star"};
 
 // The batch size for training
-const int batch_size = 1;
+const int batch_size = 16;
 
 // The number of epochs
-const int epochs = 50;
+const int epochs = 30;
 
 // The number of learning rate
-const double lr = 1e-4;
+const double lr = 1e-3;
 
 // Dataset implementation
 struct ImageFolderDataset : torch::data::Dataset<ImageFolderDataset>
@@ -84,7 +84,7 @@ struct ImageFolderDataset : torch::data::Dataset<ImageFolderDataset>
 void progress(int epoch, int epochs, double loss, float f)
 {
     std::cout << "Epoch [" << epoch << "/" << epochs << "], Loss: "
-              << loss << "\t" << f << "Hz" << "\r" << std::flush;
+              << loss << "\t\t" << f << "Hz" << "\r" << std::flush;
 }
 
 // Classifier for nClasses
@@ -163,11 +163,13 @@ int main()
 
     // Optimizer only for classifier
     torch::optim::SGD optimizer(classifier.sequ->parameters(), torch::optim::SGDOptions(lr));
+    torch::optim::StepLR scheduler(optimizer, /*step_size=*/15, /*gamma=*/0.1);
     torch::nn::CrossEntropyLoss criterion;
 
     // Logging of the loss
     std::fstream floss;
-    floss.open(loss_file, std::fstream::out);
+    const fs::path loss_path = homedir / loss_file;
+    floss.open(loss_path, std::fstream::out);
 
     float f = 0;
     // Training loop
@@ -204,13 +206,15 @@ int main()
         const double avgLoss = cumloss / (double)n;
         progress(epoch, epochs, avgLoss, f);
         floss << epoch << "\t" << avgLoss << std::endl;
+        scheduler.step();
         std::cout << std::endl
                   << std::flush;
     }
     //auto params = classifier.named_parameters();
     //torch::save(classifier.sequ, classifier_model_path);
     //torch::save({params["classifier.1.weight"], params["classifier.1.bias"]}, classifier_model_path);
-    classifier.save_classifier_weights(classifier_model_path);
+    const fs::path classifier_path = homedir / classifier_model_path;
+    classifier.save_classifier_weights(classifier_path.string());
     std::cout << "Done.\n";
 
     return 0;
