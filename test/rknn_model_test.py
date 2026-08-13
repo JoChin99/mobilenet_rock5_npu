@@ -54,7 +54,7 @@ def load_classifier(classifier_path):
 def run_rknn_infer(rknn_model_path, classifier_path, classifier, rknn):
     tp = [0] * len(classes) # true positive
     fp = [0] * len(classes) # false positive
-    tp = [0] * len(classes) # ground truth positives
+    gtp = [0] * len(classes) # ground truth positives
     true_count = 0  # total correct
     sample_num = 0
 
