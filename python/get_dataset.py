@@ -11,5 +11,4 @@ path = kagglehub.dataset_download(
     output_dir = str(save_dataset)
 )
 
-# print("File are here: ",path)
 print("File are here: ", Path(path).resolve())    # To print the full path

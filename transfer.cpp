@@ -87,7 +87,6 @@ void progress(int epoch, int epochs, double loss, float f)
               << loss << "\t\t" << f << "Hz" << "\r" << std::flush;
 }
 
-// Classifier for nClasses
 struct MobileNetV2Classifier : torch::nn::Module
 {
     const char *classifierModuleName = "classifier";
@@ -123,14 +122,6 @@ struct MobileNetV2Classifier : torch::nn::Module
             weights.insert(p.key(), p.value().detach().cpu().contiguous());
             std::cout << p.key() << " , " << p.value().sizes() << "\n";
         }
-        /*
-        std::cout << "-I- Saving the parameters named buffers in this model: " << "\n";
-        for (const auto &b : sequ->named_parameters())
-        {
-            weights.insert(b.key(), key.value().detach().cpu());
-            std::cout << b.key() << " , " << b.value().sizes() << "\n";
-        }
-        */
 
         const std::vector<char> bytes = torch::pickle_save(weights);
         std::ofstream output(pt_path, std::ios::binary);
@@ -138,7 +129,6 @@ struct MobileNetV2Classifier : torch::nn::Module
             throw std::runtime_error("-E- Failed to open file for writing: " + pt_path);
         output.write(bytes.data(), bytes.size());
         output.close();
-        //for (const auto &b : module.named_buffers())
     }
     torch::nn::Sequential sequ{nullptr};
 };
@@ -188,10 +178,6 @@ int main()
             // mobilenetv2 feature detector (without learning and pre-trained weights)
             auto fout = features.forward(data);
             // features are in a 7x7x1280 grid and need to be collapsed to just 1280 features
-            //const torch::nn::functional::AdaptiveAvgPool2dFuncOptions &ar = torch::nn::functional::AdaptiveAvgPool2dFuncOptions({1, 1});
-            //fout = torch::nn::functional::adaptive_avg_pool2d(fout, ar);
-            //fout = torch::flatten(fout, 1);
-            // libtorch classifier (with learning)
             auto output = classifier.sequ->forward(fout);
             auto loss = criterion(output, target);
             loss.backward();
@@ -210,9 +196,6 @@ int main()
         std::cout << std::endl
                   << std::flush;
     }
-    //auto params = classifier.named_parameters();
-    //torch::save(classifier.sequ, classifier_model_path);
-    //torch::save({params["classifier.1.weight"], params["classifier.1.bias"]}, classifier_model_path);
     const fs::path classifier_path = homedir / classifier_model_path;
     classifier.save_classifier_weights(classifier_path.string());
     std::cout << "Done.\n";

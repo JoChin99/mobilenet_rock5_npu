@@ -19,6 +19,7 @@
  * but a new inference thread is only started if the
  * previous one has finished
  * 
+ * Backend is selected at construction time: NPU or CPU
  */
 class RTClassifier
 {
@@ -52,7 +53,8 @@ public:
             thr.join();
     }
 
-    // Perform classificaiton in a background thread
+    // Submit a frame for async inference and return false and drops the frame
+    // if the previous inference is still running
     bool doAsyncStep(cv::Mat img)
     {
         if (isRunning)
@@ -126,7 +128,8 @@ private:
         isRunning = false;
     }
 
-    // Loads the pickled key/tensor dict by transfer.cpp
+    // The classifier is saved saved by transfer.cpp as the pickled key/tensor dict
+    // to avoid LibTorch/PyTorch naming convention mismatches
     void load_classifier_weights(const std::string &pt_path)
     {
         std::ifstream file(pt_path, std::ios::binary);

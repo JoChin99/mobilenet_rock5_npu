@@ -10,7 +10,6 @@ rknn_model_path = 'models/mobilenetv2_features.rknn'
 classifier_path = 'models/classifier.pt'
 test_results_path = Path.cwd() / 'test/rknn_test_results'
 img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
-#img_path = "test/heart.png"
 img_size = (224, 224)
 classes = ['circle', 'heart', 'star']
 labels = {'circle': 0, 'heart': 1, 'star': 2}
@@ -28,8 +27,6 @@ def preprocess_image(img_path):
 
 def load_classifier(classifier_path):
     # Load classifier
-    #classifer_model_file = torch.jit.load(classifier_path)
-    #params = list(classifer_model_file.parameters())
     classifer_model_file = torch.load(classifier_path, weights_only=False)
     if not isinstance(classifer_model_file, dict):
         raise TypeError(f"-E- Expected dict from {classifier_path}, got {type(classifer_model_file)}")
@@ -59,7 +56,6 @@ def run_rknn_infer(rknn_model_path, classifier_path, classifier, rknn):
     sample_num = 0
 
     img_files = [
-        #p for p in img_dir.rglob("*")
         (p, labels[p.parent.name])
         for class_name in classes
         for p in (img_dir / class_name).glob("*")
@@ -70,17 +66,13 @@ def run_rknn_infer(rknn_model_path, classifier_path, classifier, rknn):
     for img_path, label in tqdm(img_files):
         sample_num += 1
 
-        #label = int(img_path.parent.parent.name)
-
         input_data = preprocess_image(img_path.as_posix())
         output = rknn.inference(inputs=[input_data])
         features = output[0]                        # shape: (1, 1280)
-        #print("Output shape:", features.shape)
 
         with torch.no_grad():
             features_tensor = torch.from_numpy(features)
             logits = classifier(features_tensor)
-            # score = torch.softmax(logits, dim=1)
             pred = torch.argmax(logits, dim=1).item()
 
         if label == pred:
@@ -91,20 +83,9 @@ def run_rknn_infer(rknn_model_path, classifier_path, classifier, rknn):
             tp[label] += 1
         else:
             fp[pred] += 1
-        #if label == 1:
-        #    gtp += 1
-        #    if pred == 1:
-        #        tp += 1
 
-        #if label == 0 and pred == 1:
-        #    fp += 1
 
     accuracy = true_count / sample_num if sample_num > 0 else 0
-    ##Uncomment as this is only for one class not multiple classes
-    #recall = tp / gtp if gtp > 0 else 0
-    #precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-    #print(f"Recall: {tp} / {gtp} = {recall:.4f}")
-    #print(f"Precision: {tp} / {tp + fp} = {precision:.4f}")
     
     print(f"Accuracy: {true_count} / {sample_num} = {accuracy:.4f}")
     print(f"{'Class':<10} {'Recall':>8} {'Precision':>10}")

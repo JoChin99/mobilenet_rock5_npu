@@ -17,9 +17,8 @@ constexpr bool debugOutput = true;
 
 
 /**
- * MobileNetV2 features with pre-trained weights running on Rock5B+ NPU
-
- * This class wraps the RKNN C API
+ * MobileNetV2 features extractor with pre-trained weights running on the Rock5B+ NPU via RKNN C API
+ * 
  */
 class MobileNetV2Features : public torch::nn::Module
 {
@@ -28,7 +27,7 @@ public:
     static constexpr int N_OUTPUT_FEATURES = 1280;
     
 
-    /** Load the RKNN model */
+    //Load the RKNN model
     MobileNetV2Features(const std::string &rknn_model_file = "mobilenet_features.rknn")
     {
         // Read the .rknn file
@@ -44,17 +43,6 @@ public:
         if (ret < 0) 
             throw std::runtime_error("-E- Failed to intialize RKNN model: ");
         std::cout << "RKNN model loaded: " << rknn_model_file << "\n";
-
-        /*
-        Just for debugging purpose to print how many input and output tensors from loaded rknn model file has.
-
-        rknn_query(ctx_, RKNN_QUERY_IN_OUT_NUM, &io_num_, sizeof(io_num_));
-        if (debugOutput)
-        {
-            std::cerr << "[MobileNetV2Features] NPU model loaded: "
-                << rknn_model_file << " (in=" << io_num_.n_input << ", out=" << io_num_.n_output << ")\n";
-        }
-        */
     }
     ~MobileNetV2Features()
     {
@@ -80,26 +68,6 @@ public:
 
         for (int i = 0; i < N; i++)
         {
-            /*
-            int channel = 3;
-            int width = 0;
-            int height = 0;
-            if (input_attrs[0].fmt == RKNN_TENSOR_NCHW)
-            {
-                printf("model is NCHW input fmt\n");
-                channel = input_attrs[0].dims[1];
-                height = input_attrs[0].dims[2];
-                width = input_attrs[0].dims[3];
-            }
-            else
-            {
-                printf("model is NHWC input fmt\n");
-                height = input_attrs[0].dims[1];
-                width = input_attrs[0].dims[2];
-                channel = input_attrs[0].dims[3];
-            }
-            */
-
             // Slice [3,224,224] to [224,224,3] (NHWC) for RKNN
             auto hwc = x[i].permute({1, 2, 0}).contiguous();
             rknn_input inputs[1];
@@ -121,9 +89,6 @@ public:
 
             if (rknn_outputs_get(ctx_, 1, outputs, nullptr) < 0)
                 throw std::runtime_error("-E- Failed to get RKNN outputs.");
-            //std::cout << "buf=" << outputs[0].buf << '\n';
-            //std::cout << "size=" << outputs[0].size << '\n';
-            //std::cout << "expected=" << N_OUTPUT_FEATURES * 7 * 7 * sizeof(float) << '\n';
             std::memcpy(out[i].data_ptr<float>(), outputs[0].buf, N_OUTPUT_FEATURES * sizeof(float));
             rknn_outputs_release(ctx_, 1, outputs);
         }
@@ -153,7 +118,6 @@ public:
 
 private:
     rknn_context ctx_ = 0;  //
-    //rknn_input_output_num io_num_;
     // Store the binary contents of the RKNN model file
     std::vector<unsigned char> model_data_;
 };

@@ -10,7 +10,6 @@ onnx_model_path = 'models/mobilenetv2_features.onnx'
 classifier_path = 'models/classifier.pt'
 test_results_path = Path.cwd() / 'test/onnx_test_results'
 img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
-#img_path = "./test/heart.png"
 img_size = (224, 224)
 classes = ['circle', 'heart', 'star']
 labels = {'circle': 0, 'heart': 1, 'star': 2}
@@ -35,7 +34,7 @@ def preprocess_image(img_paths):
 
     return img
 
-def load_classifier(classifier_path): #, nfeatures=1280, nclasses=3
+def load_classifier(classifier_path):
     # Load classifier
     classifer_model_file = torch.load(classifier_path, weights_only=False)
     if not isinstance(classifer_model_file, dict):
@@ -66,20 +65,12 @@ def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
     sample_num = 0
 
     img_files = [
-        #p for p in img_dir.rglob("*")
         (p, labels[p.parent.name])
         for class_name in classes
         for p in (img_dir / class_name).glob("*")
         if p.suffix.lower() in [".jpg", ".jpeg", ".png"]
     ]
     print(f"Total test images found: {len(img_files)} images")
-
-    """
-    if'' "CUDAExecutionProvider" in ort.get_available_providers():
-        providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
-    else:
-        providers = ["CPUExecutionProvider"]  
-    """
         
     # Initialize the ONNX model
     session = ort.InferenceSession(
@@ -95,14 +86,6 @@ def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
     
     for img_path, label in tqdm(img_files):
         sample_num += 1
-        
-        #classes = {
-        #    "circle": 0,
-        #    "heart": 1,
-        #    "star": 2
-        #}
-        #label_name = img_path.parent.name
-        #label = classes[label_name]
 
         # Preprocess image
         input_data = preprocess_image(img_path.as_posix())
@@ -110,17 +93,12 @@ def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
         # Inference run using image data as the input to the model
         output = session.run(None, {input_name: input_data})
         features = output[0]
-        #print("Output shape:", features.shape)
 
         with torch.no_grad():
             features_tensor = torch.from_numpy(features)
             logits = classifier(features_tensor)
             # score = torch.softmax(logits, dim=1)
             pred = torch.argmax(logits, dim=1).item()
-
-        # Debugging purpose
-        #if sample_num < 15:
-        #    print(f"{img_path.name}: true={classes[label]}, pred={classes[pred]}")
 
         if label == pred:
             true_count += 1
@@ -130,20 +108,8 @@ def run_onnx_infer(onnx_model_path, classifier_path, classifier, device_id):
             tp[label] += 1
         else:
             fp[pred] += 1
-        #if label == 1:
-        #    gtp += 1
-        #    if pred == 1:
-        #        tp += 1
-
-        #if label == 0 and pred == 1:
-        #    fp += 1
 
     accuracy = true_count / sample_num if sample_num > 0 else 0
-    ##Uncomment as this is only for one class not multiple classes
-    #recall = tp / gtp if gtp > 0 else 0
-    #precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-    #print(f"Recall: {tp} / {gtp} = {recall:.4f}")
-    #print(f"Precision: {tp} / {tp + fp} = {precision:.4f}")
     
     print(f"Accuracy: {true_count} / {sample_num} = {accuracy:.4f}")
     print(f"{'Class':<10} {'Recall':>8} {'Precision':>10}")

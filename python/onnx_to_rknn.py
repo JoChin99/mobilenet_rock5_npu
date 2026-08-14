@@ -8,7 +8,6 @@ from tqdm import tqdm
 onnx_model_path = 'models/mobilenetv2_features.onnx'
 rknn_model_path = 'models/mobilenetv2_features.rknn'
 img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
-#img_path = 'test/heart.png'
 dataset_path = 'img_dataset.txt'
 quantize_on = True
 img_size = (224,224)
@@ -23,7 +22,6 @@ def preprocess_image(img_path):
     
     img = cv2.resize(img, img_size)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #img = np.transpose(img,(2,0,1))
     img = np.expand_dims(img, 0)
 
     return img
@@ -51,7 +49,6 @@ def convert_to_rknn():
     rknn = RKNN(verbose=True)
 
     # Pre-process config
-    # "-I-" stands for Info as a message
     print('-I- Configuring model...')
     rknn.config(
         mean_values=[[123.675, 116.28, 103.53]],    # ImageNet mean (RGB) * 255
@@ -109,7 +106,7 @@ def convert_to_rknn():
     
     if ret != 0:
         raise RuntimeError(f'-E- Failed to initialize the runtime environment: {ret}')
-        # exit(ret)
+
     print('-I- Runtime environment initialized successfully.')
 
     print("-I- Evaluating model performance...")
@@ -128,12 +125,7 @@ def convert_to_rknn():
     for img_path, label in tqdm(img_data):
         # Set inputs for model inference
         input_img = preprocess_image(img_path)
-
-        # Perform RKNN model inference 
-        # input_img = np.random.randn(1, 256, 128, 3).astype(np.float32) # For testing RKNN model inference by creating random input image tensor
         outputs = rknn.inference(inputs=[input_img])
-        #print("Outputs Shape: ", outputs[0].shape)
-        #print(img_path.name, "feature shape:", outputs[0].shape)
 
     # Quantitative accuracy analysis
     image_list = []

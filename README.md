@@ -1,10 +1,9 @@
 # MobileNetV2 deployment on ROCK 5 NPU for edge computing and transfer learning
 ## Overview
-Data classification using a frozen MobileNetV2 feature extractor running on the RK3588NPU (Rock5B+) with a trainable classifier layer. A single linear layer is trained with libtorch on the CPU.
+Data classification using a frozen MobileNetV2 feature extractor running on the RK3588NPU (Rock5B+) with a trainable classifier layer. A single linear layer is trained with libtorch on the CPU. The NPU runs INT8 inference via the Rockchip RKNN SDK. The classifier is trained and run with LibTorch (C++) and can be retrained for new classes without recompiling the NPU model.
 
 **NOTE:** It is recommended to run all Python scripts from the top level `mobilenet_rock5` directory after cloning this repository. Running the script from other directories may require modifying the file paths in the scripts accordingly.
 
-This project is work in progress.
 
 ---
 
@@ -13,10 +12,11 @@ This project is work in progress.
 |-----------|----------|
 | Radxa Rock5B+ 8GB RAM | 1 |
 | Radxa Rock5B Case | 1 |
-| PD Power Supply | 1 |
+| USB-C PD Power Supply | 1 |
 | M2 Memory Card | 1 |
-| Raspberry Pi Camera Module V2 | 1 |
 | M2 Memory Card Reader | 1 |
+| Raspberry Pi Camera Module V2 | 1 |
+| Rock5 Camera FPC Cable (31-pin to 15-pin) | 1 |
 | USB WiFi Dongle | 1 |
 
 --- 
@@ -70,7 +70,31 @@ python ./python/onnx_to_rknn.py
 This uses **img_dataset.txt** (list of image paths) as the calibration dataset. It generates a RKNN model file in the models directory, **`models/mobilenetv2_features.rknn`**
 
 ---
+Run to learn to train the final classifier:
+```bash
+./transfer
+```
+This script generates an classifier file in the models directory, **`models/classifier.pt`** and logs the loss to **`loss.dat`**
+## Benchmarking
+### CPU and NPU Performances Comparison
+Run to benchmark the model performances via different hardware accelerators:
+```bash
+python ./python/benchmark.py
+```
+This scripts provides evaluation of the model performance across both CPU and NPU backends to measure inference latency, throughput and accuracy.
 
+### Real-Time Demo
+Run the following command with the selected inference backend to perform real-time image classification using a live camera feed:
+**NPU Inference**
+```bash
+./demo npu
+```
+**CPU Inference**
+```bash
+./demo cpu
+```
+
+---
 ## Calibration
 ### Generate Calibration Dataset
 Before running the script, generate a calibration dataset by randomly selecting 3,000 (or any desired number of) images from the dataset. The following command is only **provided as an example**:
@@ -112,8 +136,10 @@ This script generates an classifier file in the models directory, **`models/clas
 mobilenet_rock5/ 
 |── data/                       # Dataset used for training and evaluation 
 |── model/                      # Trained models and converted RKNN models generated from the script
-|── scripts/                    # Training, conversion, and inference scripts 
-│   |── export_onnx.py          # Export MobileNetV2 feature extractor to ONNX 
+|── python/                    # Training, conversion, and inference scripts 
+│   |── get_dataset.py 
+│   |── benchmark.py            # CPU vs NPU latency/accuracy comparison
+│   |── mobilenetv2_to_onnx.py  # Export MobileNetV2 feature extractor to ONNX 
 │   |── onnx_to_rknn.py         # Convert ONNX model to RKNN format 
 |── test/                       # Calibration and model verification scripts 
 │   |── onnx_model_test.py 

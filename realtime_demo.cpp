@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
 
     RTClassifier rtClassifier(model_path.string(), (home_dir / classifier_model_path).string(), (int)classes.size(),npu_backend);
 
+    // Per frame counters accessed from both the main and worker thread
     std::atomic<long> nFrames{0};
     std::atomic<long> nInferFrames{0};
     std::atomic<long> nSkipFrames{0};
@@ -122,15 +123,13 @@ int main(int argc, char *argv[])
     // Inference result callback
     rtClassifier.classificationCallback = [&](int pred_class, float pred_score, long duration)
     {
-        //const long current_infer = nInferFrames.fetch_add(1) + 1;
-        //const long current_total = nFrames.load();
         nInferFrames.fetch_add(1);
         total_infer += duration;
         last_label.store(pred_score > min_prob ? pred_class : -1);
         last_prob_int.store(pred_score);
         last_infer_ms.store(duration);
 
-        /* Avoid spamming the terminal with output messages */ 
+        // Avoid spamming the terminal with output messages
         // Ignore uncertain predictions
         if (pred_score < min_prob)
             pred_class = -1;
@@ -148,13 +147,6 @@ int main(int argc, char *argv[])
         if (classPred_count < frame_thres)
             return;
         
-        // Stay quiet if the output is the same class as before
-        /*if(pred_class == last_pred_class)
-        {
-            return;
-        }
-        */
-        //last_pred_class = pred_class;
         static auto prev_out = std::chrono::steady_clock::now();
         auto now = std::chrono::steady_clock::now();
 
@@ -169,7 +161,6 @@ int main(int argc, char *argv[])
         }
         prev_out = now;
 
-        //std::cout << "[" << current_infer << "/" << current_total << "]" << "Class Name: " << classes[pred_class] << ", Prediction score: " << (int)(pred_score*100) << "%, Latency: " << duration << "ms  \r" << std::flush;
         if (pred_class == -1)
         {
             std::cout << "-I- Class Name: Not detected" << ", Prediction score: " << (int)(pred_score*100) << "%, Inference Time: " << duration << "ms\n" << std::flush;
@@ -179,14 +170,6 @@ int main(int argc, char *argv[])
             std::cout << "-I- Class Name: " << classes[pred_class] << ", Prediction score: " << (int)(pred_score*100) << "%, Inference Time: " << duration << "ms\n" << std::flush;
         }
     };
-
-    /*
-    // Increase exposure
-    setV4L2OpenCVParam(
-        "/dev/v4l-subdev2",
-        V4L2_CID_EXPOSURE,
-        2000
-    ); */
 
     // Increase gain
     setV4L2OpenCVParam(
@@ -204,29 +187,14 @@ int main(int argc, char *argv[])
     
     // Camera settings
     cam.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('N','V','1','2')); //Pixel format
-    //cam.set(cv::CAP_PROP_GAIN, 6000);
     cam.set(cv::CAP_PROP_FRAME_WIDTH,  640);
     cam.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    cam.set(cv::CAP_PROP_FPS, 30);
+    cam.set(cv::CAP_PROP_FPS, 20);
     cam.set(cv::CAP_PROP_CONVERT_RGB, 1);
     std::cout << "Camera: " << cam.getBackendName() << std::endl;
     std::cout << "-I- Camera frame size: " << cam.get(cv::CAP_PROP_FRAME_WIDTH) << ", " << cam.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
 
-    //For debugging purpose
-    /*
-    const double fps = cam.get(cv::CAP_PROP_FPS);
-    const int fourcc = cam.get(cv::CAP_PROP_FOURCC);
-    std::cout << "-I- Pipeline: " << (rkaiq_cam_eng ? "Grey-world white balance" : "RKAIQ (ISP)") << "\n";
-
-    cv::Mat test_frame; 
-    cam >> test_frame; 
-    if (!test_frame.empty()) { 
-        cv::imwrite((home_dir / "mobilenet_rock5/cam_test.jpg").string(), test_frame);
-        std::cout << "Frame type: " << test_frame.channels() << "channels, Type= " << test_frame.type() << "\n"; // Check if it is BGR (3 channels)
-        std::cout << "Test frame is saved to /home/ning/mobilenet_rock5/cam_test.jpg\n"; 
-    } 
-    */
-
+    // Run one silient inference so the NPU context is fully initialised before the timed loop starts
     cv::Mat initFrame(480,640, CV_8UC3, cv::Scalar(0,0,0));
     int cl;
     float cp;
@@ -236,7 +204,6 @@ int main(int argc, char *argv[])
     cv::Mat frame;
     cv::Mat last_frame;
     const auto benchStart = std::chrono::steady_clock::now();
-    //std::cout << cv::getBuildInformation() << std::endl;
 
     while (running)
     {
@@ -264,8 +231,14 @@ int main(int argc, char *argv[])
         const double rDrop_pct = rTotal > 0 ? 100.0 * rDrop_frame / rTotal : 0.0;
         const double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-benchStart).count() / 1000.0;
         const double rFps = elapsed > 0 ? rTotal / elapsed : 0.0;
+        static auto lastPrint = std::chrono::steady_clock::now();
+        const auto now = std::chrono::steady_clock::now();
 
-        std::cout << "[RT] Frames=" << rTotal << ", Inferred=" << rInfer << ", Dropped=" << rDrop_frame << " (" << std::fixed << std::setprecision(1) << rDrop_pct << "%)" << ", FPS=" << rFps << "\n" << std::flush;
+        if(now-lastPrint > std::chrono::seconds(1))
+        {
+            std::cout << "[RT] Frames=" << rTotal << ", Inferred=" << rInfer << ", Dropped=" << rDrop_frame << " (" << std::fixed << std::setprecision(1) << rDrop_pct << "%)" << ", FPS=" << rFps << "\n" << std::flush;
+            lastPrint = now;
+        }
 
         if(!rtClassifier.doAsyncStep(frame))
             nSkipFrames++;
@@ -273,10 +246,9 @@ int main(int argc, char *argv[])
     rtClassifier.waitForCompletion();
     std::cout << "\n";
 
-    //For debugging purpose
+    // Save the last captured frame for debugging purpose
     if (!last_frame.empty())
     {
-        //cv::resize(last_frame, last_frame, cv::Size(224, 224));
         cv::imwrite((home_dir / "mobilenet_rock5/debug_frame_final.jpg").string(), last_frame);
     }
 
