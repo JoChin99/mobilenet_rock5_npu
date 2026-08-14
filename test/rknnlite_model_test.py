@@ -7,7 +7,6 @@ from tqdm import tqdm
 
 rknn_model_path = 'models/mobilenetv2_features.rknn'
 img_dir = Path('data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/')
-#img_path = "~/mobilenet_rock5/test/heart.png"
 img_size = (224,224)
 npu_target = 'rk3588'
 class_names = ['circle', 'heart', 'star']
@@ -82,7 +81,6 @@ def run_rknn_lite():
         print('-I- Running RKNN model inference...')
         outputs = rknn_lite.inference(inputs=[input_img], data_format=['nhwc'])
         print("Outputs Shape: ", outputs[0].shape)
-        #print(img_path.name, "feature shape:", outputs[0].shape)
 
     rknn_lite.release()
 
