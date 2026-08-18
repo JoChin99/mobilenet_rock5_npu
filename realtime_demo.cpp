@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
     cam.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('N','V','1','2')); //Pixel format
     cam.set(cv::CAP_PROP_FRAME_WIDTH,  640);
     cam.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    cam.set(cv::CAP_PROP_FPS, 20);
+    cam.set(cv::CAP_PROP_FPS, 30);
     cam.set(cv::CAP_PROP_CONVERT_RGB, 1);
     std::cout << "Camera: " << cam.getBackendName() << std::endl;
     std::cout << "-I- Camera frame size: " << cam.get(cv::CAP_PROP_FRAME_WIDTH) << ", " << cam.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;

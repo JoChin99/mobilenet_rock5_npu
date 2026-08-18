@@ -36,7 +36,7 @@ public:
         {
             // CPU via ONNX Runtime
             Ort::SessionOptions opts;
-            opts.SetIntraOpNumThreads(4);
+            opts.SetIntraOpNumThreads(1);
             sess = std::make_unique<Ort::Session>(env, model_path.c_str(), opts);
         }
 
