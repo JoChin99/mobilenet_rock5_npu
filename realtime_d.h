@@ -1,3 +1,7 @@
+/**
+ * (c) 2026 Bernd Porr and Jui Ning Chin
+**/
+
 #pragma once
 
 #include "mobilenetv2_features.h"

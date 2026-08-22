@@ -1,3 +1,8 @@
+/**
+ * MobileNetV2 features with pretrained weights
+ * (c) 2026 Bernd Porr and Jui Ning Chin
+**/
+
 #pragma once
 
 #include <torch/torch.h>

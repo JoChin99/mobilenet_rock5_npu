@@ -1,3 +1,8 @@
+/**
+ * Transfer learning using Libtorch for Rock5 NPU deployment
+ * (c) 2026 Bernd Porr and Jui Ning Chin
+**/
+
 #include "mobilenetv2_features.h"
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>

@@ -1,8 +1,10 @@
 # MobileNetV2 deployment on ROCK 5 NPU for edge computing and transfer learning
 ## Overview
-Data classification using a frozen MobileNetV2 feature extractor running on the RK3588NPU (Rock5B+) with a trainable classifier layer. A single linear layer is trained with libtorch on the CPU. The NPU runs INT8 inference via the Rockchip RKNN SDK. The classifier is trained and run with LibTorch (C++) and can be retrained for new classes without recompiling the NPU model.
+This project implements real-time image classification on the Radxa Rock5B+ (RK3588) by combining NPU-accelerated feature extraction with CPU-based transfer learning. Data classification using a frozen MobileNetV2 feature extractor running on the RK3588 NPU with a trainable classifier layer. A single linear layer is trained with libtorch on the CPU. The NPU runs INT8 inference via the Rockchip RKNN SDK. The classifier is trained and run with LibTorch (C++) and can be retrained for new classes without recompiling the NPU model.
 
-**NOTE:** It is recommended to run all Python scripts from the top level `mobilenet_rock5` directory after cloning this repository. Running the script from other directories may require modifying the file paths in the scripts accordingly.
+**NOTE 1:** It is recommended to run all Python scripts from the top level `mobilenet_rock5` directory after cloning this repository. Running the script from other directories may require modifying the file paths in the scripts accordingly. 
+
+**NOTE 2:** The RKNN Toolkit currently supports Python versions up to Python 3.12. Therefore, Python 3.13 or later may not be compatible with the RKNN Toolkit and may cause errors when running the code. It is recommended to use Python 3.12 for this project.
 
 
 ---
@@ -22,6 +24,39 @@ Data classification using a frozen MobileNetV2 feature extractor running on the 
 --- 
 
 ## Prerequisites
+All commands, setup, and installation steps must be performed directly on the board.
+
+### Build Python3.12 from the source code
+Before running the setup script, install the required system packages:
+**1. Install require dependencies**
+```bash
+sudo apt update
+sudo apt-get install wget build-essential checkinstall 
+sudo apt install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git
+```
+
+**2. Install required packages**
+```bash
+wget https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tgz
+tar -xf Python-3.12.0.tgz
+cd Python-3.12.0
+./configure --enable-optimizations
+make -j8
+```
+
+**3. Install Python**
+```bash
+make altinstall
+```
+When Python 3.12 is installed manually from source, it is typically installed to /usr/local/bin/python3.12.
+Otherwise, the package installation is located in /usr/bin/.
+**NOTE:** Please make sure to update the file path in the Environment Setup section if Python 3.12 is installed in a different location.
+
+**4. Verify installation after download**
+```bash
+python3 --version
+```
+
 ### Environment setup
 Run this shell script to create the virtual environment:
 ```bash
@@ -34,14 +69,30 @@ source rock5b_env/bin/activate
 
 Or run this to create manually:
 ```bash
-python3 -m venv rock5b_env
+/usr/local/bin/python3.12 -m venv rock5b_env
 source rock5b_env/bin/activate
+python3.12 -m pip --version
+python -m pip install --upgrade pip 
+```
+
+```bash
+# Download RKNN Related Repositories
+mkdir rknpu
+git clone https://github.com/airockchip/rknn-toolkit2.git --depth 1 rknpu/rknn-toolkit2
+
+# Install RKNN Toolkit Lite2 for Python 3.12
+pip install rknpu/rknn-toolkit2/rknn-toolkit-lite2/packages/rknn_toolkit_lite2-2.3.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+```
+
+```bash
+# Install all required Python packages
 pip install -r requirements.txt
 ```
 
 ### C++ build to compile the transfer learning code
 ```bash
 mkdir build && cd build
+sudo apt install cmake
 cmake ..
 make
 ```
@@ -82,6 +133,21 @@ Run to benchmark the model performances via different hardware accelerators:
 python ./python/benchmark.py
 ```
 This scripts provides evaluation of the model performance across both CPU and NPU backends to measure inference latency, throughput and accuracy.
+
+### RKAIQ Camera Engine Setup (Optional)
+Camera Configuration: This project uses a Raspberry Pi Camera Module v2 connected to the board's CAM0 port.
+
+**NOTE1:** RKAIQ camera processing is **disabled by default**. To disable the RKAIQ camera engine, set: 
+```cpp
+const bool rkaiq_cam_eng = true
+```
+To enable the RKAIQ camera engine, set:
+```cpp
+const bool rkaiq_cam_eng = false
+```
+Please check dependencies are compatible before installation. If you plan to use the RKAIQ camera engine, you may need to manually locate and install the appropriate camera engine package for your camera and system configuration. Please ensure that the package and all required dependencies are compatible before installation.
+
+**NOTE2:** Check your camera pipeline before running the code. The setup and configuration process may differ depending on the camera model and hardware being used.
 
 ### Real-Time Demo
 Run the following command with the selected inference backend to perform real-time image classification using a live camera feed:
@@ -155,6 +221,3 @@ mobilenet_rock5/
 |── transfer.cpp                # Transfer learning
 ``` 
 
----
-
-## License

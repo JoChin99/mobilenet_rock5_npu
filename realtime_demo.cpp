@@ -1,3 +1,8 @@
+/**
+ * Real-Time Classification Demo on CPU and NPU
+ * (c) 2026 Bernd Porr and Jui Ning Chin
+**/
+
 #include "realtime_d.h"
 #include <opencv2/opencv.hpp>
 #include <unistd.h>
@@ -31,7 +36,7 @@ const std::vector<std::string> classes = {"circle", "heart", "star"};
 const char cam_dev[] = "/dev/video11";
 
 // Check if RKAIQ Camera Engine is not using, true = not running
-const bool rkaiq_cam_eng = false;
+const bool rkaiq_cam_eng = true;
 
 
 std::atomic<bool> running(true);
