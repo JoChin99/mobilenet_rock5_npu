@@ -28,6 +28,7 @@ All commands, setup, and installation steps must be performed directly on the bo
 
 ### Build Python3.12 from the source code
 Before running the setup script, install the required system packages:
+
 **1. Install require dependencies**
 ```bash
 sudo apt update
@@ -50,6 +51,7 @@ make altinstall
 ```
 When Python 3.12 is installed manually from source, it is typically installed to /usr/local/bin/python3.12.
 Otherwise, the package installation is located in /usr/bin/.
+
 **NOTE:** Please make sure to update the file path in the Environment Setup section if Python 3.12 is installed in a different location.
 
 **4. Verify installation after download**
@@ -137,7 +139,7 @@ This scripts provides evaluation of the model performance across both CPU and NP
 ### RKAIQ Camera Engine Setup (Optional)
 Camera Configuration: This project uses a Raspberry Pi Camera Module v2 connected to the board's CAM0 port.
 
-**NOTE1:** RKAIQ camera processing is **disabled by default**. To disable the RKAIQ camera engine, set: 
+**NOTE 1:** RKAIQ camera processing is **disabled by default**. To disable the RKAIQ camera engine, set: 
 ```cpp
 const bool rkaiq_cam_eng = true
 ```
@@ -147,10 +149,11 @@ const bool rkaiq_cam_eng = false
 ```
 Please check dependencies are compatible before installation. If you plan to use the RKAIQ camera engine, you may need to manually locate and install the appropriate camera engine package for your camera and system configuration. Please ensure that the package and all required dependencies are compatible before installation.
 
-**NOTE2:** Check your camera pipeline before running the code. The setup and configuration process may differ depending on the camera model and hardware being used.
+**NOTE 2:** Check your camera pipeline before running the code. The setup and configuration process may differ depending on the camera model and hardware being used.
 
 ### Real-Time Demo
 Run the following command with the selected inference backend to perform real-time image classification using a live camera feed:
+
 **NPU Inference**
 ```bash
 ./demo npu
