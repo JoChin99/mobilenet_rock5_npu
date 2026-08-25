@@ -2,6 +2,28 @@
 
 set -e
 
+# Download system build dependencies for C++
+sudo apt install cmake libtorch-dev libopencv-dev
+
+# Download the specific ONNX Runtime version
+ONNX_VER="1.26.0"
+ONNX_TAR_FILE="onnxruntime-linux-aarch64-${ONNX_VER}.tgz"
+ONNX_DIR="onnxruntime"
+
+if [ ! -d "$ONNX_DIR" ]; then
+    if [ ! -f "$ONNX_TAR_FILE" ]; then
+        echo "-I- Downloading ONNX Runtime C++ SDK."
+        wget "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VER}/${ONNX_TAR_FILE}"
+    fi
+
+    tar -xzf "$ONNX_TAR_FILE"
+    mv "onnxruntime-linux-aarch64-${ONNX_VER}" "$ONNX_DIR"
+    rm -rf "$ONNX_TAR_FILE"
+else
+    echo "-I- ONNX Runtime C++ SDK already exists."
+fi
+
+
 ROCK5B_DIR="rock5b_env"
 
 if [ ! -d "$ROCK5B_DIR" ]; then
@@ -31,7 +53,6 @@ fi
 
 # Install RKNN Toolkit Lite2 for Python 3.12
 pip install rknpu/rknn-toolkit2/rknn-toolkit-lite2/packages/rknn_toolkit_lite2-2.3.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
-
 pip install -r requirements.txt
 
 echo "-I- Done"

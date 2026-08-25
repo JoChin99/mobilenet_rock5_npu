@@ -6,6 +6,7 @@ This project implements real-time image classification on the Radxa Rock5B+ (RK3
 
 **NOTE 2:** The RKNN Toolkit currently supports Python versions up to Python 3.12. Therefore, Python 3.13 or later may not be compatible with the RKNN Toolkit and may cause errors when running the code. It is recommended to use Python 3.12 for this project.
 
+**NOTE 3:** ONNX Runtime version 1.26.0 is used to ensure compatibility with the other package versions in this project.
 
 ---
 
@@ -71,6 +72,14 @@ source rock5b_env/bin/activate
 
 Or run this to create manually:
 ```bash
+# Install required packages for C++ build
+sudo apt install cmake libtorch-dev libopencv-dev
+wget https://github.com/microsoft/onnxruntime/releases/download/v1.26.0/onnxruntime-linux-aarch64-1.26.0.tgz
+tar -xzf onnxruntime-linux-aarch64-1.26.0.tgz
+mv onnxruntime-linux-aarch64-1.26.0 onnxruntime
+```
+
+```bash
 /usr/local/bin/python3.12 -m venv rock5b_env
 source rock5b_env/bin/activate
 python3.12 -m pip --version
@@ -92,10 +101,9 @@ pip install -r requirements.txt
 ```
 
 ### C++ build to compile the transfer learning code
+Please ensure that all required dependencies and environment settings are properly configured before running CMake. Run the setup_env.sh script or setup manually first to setup the required environment.
 ```bash
-mkdir build && cd build
-sudo apt install cmake
-cmake ..
+cmake .
 make
 ```
 
@@ -219,8 +227,12 @@ mobilenet_rock5/
 |── README.md  
 |── img_datset.txt              # List of image paths
 |── mobilenetv2_features.h
+|── realtime_d.h
+|── realtime_demo.cpp           # Real time classification demo
+|── realtime_demo_w_monitor.cpp # Real time classification demo with a small monitor
 |── requirements.txt            # Python package dependencies 
-|── setup.sh                    # Script to create a virtual environment 
+|── setup_env.sh                # Script to create a virtual environment 
 |── transfer.cpp                # Transfer learning
+|── LICENSE
 ``` 
 
