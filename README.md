@@ -2,6 +2,14 @@
 ## Overview
 This project implements real-time image classification on the Radxa Rock5B+ (RK3588) by combining NPU-accelerated feature extraction with CPU-based transfer learning. Data classification using a frozen MobileNetV2 feature extractor running on the RK3588 NPU with a trainable classifier layer. A single linear layer is trained with libtorch on the CPU. The NPU runs INT8 inference via the Rockchip RKNN SDK. The classifier is trained and run with LibTorch (C++) and can be retrained for new classes without recompiling the NPU model.
 
+![Overview](hardware_overview.png)
+![Software System Architecture](system_architecture.png)
+
+1. **Offline (host PC)** — strip the ImageNet head from a pretrained MobileNetV2, export to ONNX and quantise to INT8 with RKNN-Toolkit2. Output file: `mobilenetv2_features.rknn`.
+2. **Transfer learning (on the board)** — `transfer.cpp` runs the NPU feature extractor and trains the Linear head with LibTorch. Output file: `classifier.pt`.
+3. **Real-time demo (on the board)** — `realtime_demo.cpp` reads camera frames, runs the NPU extractor, feeds the result to the trained head and prints the class, prediction score and latency.
+![Training Workflow](training_workflow.png)
+
 **NOTE 1:** It is recommended to run all Python scripts from the top level `mobilenet_rock5` directory after cloning this repository. Running the script from other directories may require modifying the file paths in the scripts accordingly. 
 
 **NOTE 2:** The RKNN Toolkit currently supports Python versions up to Python 3.12. Therefore, Python 3.13 or later may not be compatible with the RKNN Toolkit and may cause errors when running the code. It is recommended to use Python 3.12 for this project.
@@ -204,6 +212,9 @@ Run to learn to train the final classifier:
 ./transfer
 ```
 This script generates an classifier file in the models directory, **`models/classifier.pt`** and logs the loss to **`loss.dat`**
+
+The file `loss.dat` contains the loss:
+![Training Loss](training_loss.png)
 
 ---
 
