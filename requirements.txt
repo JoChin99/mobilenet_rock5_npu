@@ -11,7 +11,6 @@ protobuf==4.25.4
 tqdm==4.68.4
 kagglehub==1.0.2
 rknn-toolkit2==2.3.2
-rknn-toolkit-lite2==2.3.2
 scikit-learn==1.9.0
 setuptools==80.9.0
 wheel==0.47.0
