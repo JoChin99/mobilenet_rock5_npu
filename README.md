@@ -7,16 +7,16 @@ This project implements real-time image classification on the Radxa Rock5B+ (RK3
 ![Software System Architecture](system_architecture.png)
 
 ## Training Workflow
-1. **Offline (host PC)** — strip the ImageNet head from a pretrained MobileNetV2, export to ONNX and quantise to INT8 with RKNN-Toolkit2. Output file: `mobilenetv2_features.rknn`.
-2. **Transfer learning (on the board)** — `transfer.cpp` runs the NPU feature extractor and trains the Linear head with LibTorch. Output file: `classifier.pt`.
-3. **Real-time demo (on the board)** — `realtime_demo.cpp` reads camera frames, runs the NPU extractor, feeds the result to the trained head and prints the class, prediction score and latency.
+1. **Offline (host PC)** - strip the ImageNet head from a pretrained MobileNetV2, export to ONNX and quantise to INT8 with RKNN-Toolkit2. Output file: `mobilenetv2_features.rknn`.
+2. **Transfer learning (on the board)** - `transfer.cpp` runs the NPU feature extractor and trains the Linear head with LibTorch. Output file: `classifier.pt`.
+3. **Real-time demo (on the board)** - `realtime_demo.cpp` reads camera frames, runs the NPU extractor, feeds the result to the trained head and prints the class, prediction score and latency.
 ![Training Workflow](training_workflow.png)
 
-> [NOTE 1] It is recommended to run all Python scripts from the top level `mobilenet_rock5` directory after cloning this repository. Running the script from other directories may require modifying the file paths in the scripts accordingly. 
+**NOTE 1:** It is recommended to run all Python scripts from the top level `mobilenet_rock5` directory after cloning this repository. Running the script from other directories may require modifying the file paths in the scripts accordingly. 
 
-> [NOTE 2] The RKNN Toolkit currently supports Python versions up to Python 3.12. Therefore, Python 3.13 or later may not be compatible with the RKNN Toolkit and may cause errors when running the code. It is recommended to use Python 3.12 for this project.
+**NOTE 2:** The RKNN Toolkit currently supports Python versions up to Python 3.12. Therefore, Python 3.13 or later may not be compatible with the RKNN Toolkit and may cause errors when running the code. It is recommended to use Python 3.12 for this project.
 
-> [NOTE 3] ONNX Runtime version 1.26.0 is used to ensure compatibility with the other package versions in this project.
+**NOTE 3:** ONNX Runtime version 1.26.0 is used to ensure compatibility with the other package versions in this project.
 
 ---
 
@@ -63,7 +63,7 @@ make altinstall
 When Python 3.12 is installed manually from source, it is typically installed to /usr/local/bin/python3.12.
 Otherwise, the package installation is located in /usr/bin/.
 
-> [NOTE] Please make sure to update the file path in the Environment Setup section if Python 3.12 is installed in a different location.
+**NOTE:** Please make sure to update the file path in the Environment Setup section if Python 3.12 is installed in a different location.
 
 **4. Verify installation after download**
 ```bash
@@ -157,7 +157,7 @@ This scripts provides evaluation of the model performance across both CPU and NP
 ### RKAIQ Camera Engine Setup (Optional)
 Camera Configuration: This project uses a Raspberry Pi Camera Module v2 connected to the board's CAM0 port.
 
-> [NOTE 1] RKAIQ camera processing is **disabled by default**. To disable the RKAIQ camera engine, set: 
+RKAIQ camera processing is **disabled by default**. To disable the RKAIQ camera engine, set: 
 ```cpp
 const bool rkaiq_cam_eng = true
 ```
@@ -167,7 +167,7 @@ const bool rkaiq_cam_eng = false
 ```
 Please check dependencies are compatible before installation. If you plan to use the RKAIQ camera engine, you may need to manually locate and install the appropriate camera engine package for your camera and system configuration. Please ensure that the package and all required dependencies are compatible before installation.
 
-> [NOTE 2] Check your camera pipeline before running the code. The setup and configuration process may differ depending on the camera model and hardware being used.
+**NOTE:** Check your camera pipeline before running the code. The setup and configuration process may differ depending on the camera model and hardware being used.
 
 ### Real-Time Demo
 Run the following command with the selected inference backend to perform real-time image classification using a live camera feed:
