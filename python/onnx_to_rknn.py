@@ -70,9 +70,13 @@ def convert_to_rknn():
 
     imgs = load_imgs()
     dataset_file = open(dataset_path, "w", encoding="utf-8")
+    n = 100
     for img in imgs:
-       dataset_file.write(str(img[0]));
-       dataset_file.write("\n");
+       dataset_file.write(str(img[0]))
+       dataset_file.write("\n")
+       n = n - 1
+       if n == 0:
+           break
     dataset_file.close();
 
     # Build RKNN model for NPU
