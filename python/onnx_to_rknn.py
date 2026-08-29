@@ -68,6 +68,12 @@ def convert_to_rknn():
 
     print(f'-I- ONNX model loaded successfully.')
 
+    imgs = load_imgs()
+    dataset_file = open(dataset_path, "w", encoding="utf-8")
+    for img in imgs:
+       dataset_file.write(str(img[0]));
+       dataset_file.write("\n");
+    dataset_file.close();
 
     # Build RKNN model for NPU
     print('-I- Building model...')
