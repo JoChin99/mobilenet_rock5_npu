@@ -17,16 +17,16 @@
 namespace fs = std::filesystem;
 
 // Path of the Kaggle dataset
-const fs::path datasetpath = "mobilenet_rock5/data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/";
+const fs::path datasetpath = "data/2d-geometric-shapes-17-shapes/2D_Geometric_Shapes_Dataset/";
 
 // Path of the RKNN model
-const fs::path rknn_model_path  = "mobilenet_rock5/models/mobilenetv2_features.rknn";
+const fs::path rknn_model_path  = "models/mobilenetv2_features.rknn";
 
 // Path to the classifier file
-const char classifier_model_path[] = "mobilenet_rock5/models/classifier.pt";
+const char classifier_model_path[] = "models/classifier.pt";
 
 // Path to the loss log file
-const char loss_file[] = "mobilenet_rock5/models/loss.dat";
+const char loss_file[] = "models/loss.dat";
 
 // Subdirs of the classes
 const std::vector<fs::path> classes = {"circle", "heart", "star"};
@@ -144,8 +144,7 @@ int main()
     torch::manual_seed(42);
     torch::Device device(torch::kCPU);
 
-    const fs::path homedir(getpwuid(getuid())->pw_dir);
-    ImageFolderDataset ds(homedir / datasetpath, classes);
+    ImageFolderDataset ds(datasetpath, classes);
 
     // Creates a DataLoader instance for a stateless dataset.
     auto loader = torch::data::make_data_loader(
@@ -153,7 +152,7 @@ int main()
         torch::data::DataLoaderOptions().batch_size(batch_size));
 
     // Model setup
-    MobileNetV2Features features(homedir / rknn_model_path.string());
+    MobileNetV2Features features(rknn_model_path.string());
     MobileNetV2Classifier classifier(features.N_OUTPUT_FEATURES, classes.size());
 
     // Optimizer only for classifier
@@ -163,7 +162,7 @@ int main()
 
     // Logging of the loss
     std::fstream floss;
-    const fs::path loss_path = homedir / loss_file;
+    const fs::path loss_path = loss_file;
     floss.open(loss_path, std::fstream::out);
 
     float f = 0;
@@ -201,7 +200,7 @@ int main()
         std::cout << std::endl
                   << std::flush;
     }
-    const fs::path classifier_path = homedir / classifier_model_path;
+    const fs::path classifier_path = classifier_model_path;
     classifier.save_classifier_weights(classifier_path.string());
     std::cout << "Done.\n";
 
