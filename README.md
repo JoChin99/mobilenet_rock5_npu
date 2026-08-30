@@ -147,12 +147,6 @@ python ./python/onnx_to_rknn.py
 ```
 This uses **img_dataset.txt** (list of image paths) as the calibration dataset. It generates a RKNN model file in the models directory, **`models/mobilenetv2_features.rknn`**
 
----
-Run to learn to train the final classifier:
-```bash
-./transfer
-```
-This script generates an classifier file in the models directory, **`models/classifier.pt`** and logs the loss to **`loss.dat`**
 ## Benchmarking
 ### CPU and NPU Performances Comparison
 Run to benchmark the model performances via different hardware accelerators:
@@ -226,7 +220,7 @@ mobilenet_rock5/
 |── data/                       # Dataset used for training and evaluation 
 |── model/                      # Trained models and converted RKNN models generated from the script
 |── python/                    # Training, conversion, and inference scripts 
-│   |── get_dataset.py 
+│   |── create_dataset.py 
 │   |── benchmark.py            # CPU vs NPU latency/accuracy comparison
 │   |── mobilenetv2_to_onnx.py  # Export MobileNetV2 feature extractor to ONNX 
 │   |── onnx_to_rknn.py         # Convert ONNX model to RKNN format 
@@ -237,7 +231,6 @@ mobilenet_rock5/
 │   |── rknnlite_model_unit_test.py 
 |── CMakeLists.txt
 |── README.md  
-|── img_datset.txt              # List of image paths
 |── mobilenetv2_features.h
 |── realtime_d.h
 |── realtime_demo.cpp           # Real time classification demo
@@ -247,4 +240,3 @@ mobilenet_rock5/
 |── transfer.cpp                # Transfer learning
 |── LICENSE
 ``` 
-
