@@ -188,16 +188,12 @@ Each script targets a different inference backend. Choose any of the following s
 ```bash
 python ./test/onnx_model_test.py
 python ./test/rknn_model_test.py
-python ./test/rknnlite_model_test.py
-python ./test/rknnlite_model_unit_test.py
 ```
 The following table provides an overview of the test scripts:
 | Test | Description |
 |------|-------------|
 | onnx_model_test.py | Batch tests on the ONNX model with the classifier head |
 | rknn_model_test.py | Batch tests on the RKNN model via rknn-toolkit2 |
-| rknnlite_model_test.py | Batch tests on the RKNN model via rknn-toolkit-lite2 on the target device |
-| rknnlite_model_unit_test.py | Single image inference via rknn-toolkit-lite2 |
 
 ---
 
