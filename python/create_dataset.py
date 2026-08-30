@@ -1,11 +1,10 @@
+import kagglehub
+from pathlib import Path
 import os
 import random
 import numpy as np
 from PIL import Image, ImageDraw
-
-heart_data = "heart"
-
-os.makedirs(heart_data, exist_ok=True)
+from tqdm import tqdm
 
 def random_colour():
     colours = ( 
@@ -66,8 +65,23 @@ def draw_heart(path):
     img.save(path)
 
 
-for i in range(50000):
+kaggle_dataset = "khalidboussaroual/2d-geometric-shapes-17-shapes"
+dataset_name = kaggle_dataset.split("/")[-1]    # To keep the dataset name 
+save_dataset = Path.cwd() / "data" / dataset_name
+save_dataset.mkdir(parents=True, exist_ok=True)
+
+path = kagglehub.dataset_download(
+    kaggle_dataset,
+    output_dir = str(save_dataset)
+)
+
+print("Creating hearts")
+heart_data = save_dataset / "2D_Geometric_Shapes_Dataset" / "heart"
+os.makedirs(heart_data, exist_ok=True)
+for i in tqdm(range(50000)):
     file_name = f"{i}.png"
 
     file_path = os.path.join(heart_data, file_name)
     draw_heart(file_path)
+
+print("File are here: ", Path(path).resolve())    # To print the full path
