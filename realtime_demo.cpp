@@ -20,13 +20,13 @@
 namespace fs = std::filesystem;
 
 // Path of the RKNN model (NPU)
-const fs::path rknn_model_path  = "mobilenet_rock5/models/mobilenetv2_features.rknn";
+const char rknn_model_path[]  = "models/mobilenetv2_features.rknn";
 
 // Path of the ONNX model (CPU)
-const fs::path onnx_model_path = "mobilenet_rock5/models/mobilenetv2_features.onnx";
+const char onnx_model_path[] = "models/mobilenetv2_features.onnx";
 
 // Path to the classifier file
-const char classifier_model_path[] = "mobilenet_rock5/models/classifier.pt";
+const char classifier_model_path[] = "models/classifier.pt";
 
 // Subdirs of the classes
 const std::vector<std::string> classes = {"circle", "heart", "star"};
@@ -103,11 +103,10 @@ int main(int argc, char *argv[])
             npu_backend = false;
     }
 
-    const fs::path home_dir(getpwuid(getuid())->pw_dir);
-    const fs::path model_path = home_dir / (npu_backend ? rknn_model_path : onnx_model_path);
+    const fs::path model_path = (npu_backend ? rknn_model_path : onnx_model_path);
     std::cout << "-I- Backend: " << (npu_backend ? "NPU" : "CPU") << "\n";
 
-    RTClassifier rtClassifier(model_path.string(), (home_dir / classifier_model_path).string(), (int)classes.size(),npu_backend);
+    RTClassifier rtClassifier(model_path, classifier_model_path, (int)classes.size(),npu_backend);
 
     // Per frame counters accessed from both the main and worker thread
     std::atomic<long> nFrames{0};
@@ -254,7 +253,7 @@ int main(int argc, char *argv[])
     // Save the last captured frame for debugging purpose
     if (!last_frame.empty())
     {
-        cv::imwrite((home_dir / "mobilenet_rock5/debug_frame_final.jpg").string(), last_frame);
+        cv::imwrite("debug_frame_final.jpg", last_frame);
     }
 
     const auto benchEnd = std::chrono::steady_clock::now();
