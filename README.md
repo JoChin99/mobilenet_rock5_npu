@@ -223,8 +223,6 @@ mobilenet_rock5/
 |── test/                       # Calibration and model verification scripts 
 │   |── onnx_model_test.py 
 │   |── rknn_model_test.py 
-│   |── rknnlite_model_test.py 
-│   |── rknnlite_model_unit_test.py 
 |── CMakeLists.txt
 |── README.md  
 |── mobilenetv2_features.h
