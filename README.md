@@ -26,7 +26,7 @@ This project implements real-time image classification on the Radxa Rock5B+ (RK3
 | Component | Quantity |
 |-----------|----------|
 | Radxa Rock5B+ 8GB RAM | 1 |
-| Radxa Rock5B Case | 1 |
+| Radxa Rock5B+ Case (3D Printing) | 1 |
 | USB-C PD Power Supply | 1 |
 | M2 Memory Card | 1 |
 | M2 Memory Card Reader | 1 |
