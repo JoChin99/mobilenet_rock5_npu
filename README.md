@@ -18,7 +18,7 @@ This project implements real-time image classification on the Radxa Rock5B+ (RK3
 
 **NOTE 3:** ONNX Runtime version 1.26.0 is used to ensure compatibility with the other package versions in this project.
 
-**NOTE 4:** This project uses the heart, circle and star patterns as the target classes. If you plan to test the project with other datasets or different classes, you may need to manually update the class names in the relevant scripts to match the classes in your dataset (such as `onnx_to_rknn.py`, `onnx_model_test.py`, `rknn_model_test.py`, `rknnlite_model_test.py`, `transfer.cpp` & `realtime_demo.cpp`).
+**NOTE 4:** This project uses the heart, circle and star patterns as the target classes. If you plan to test the project with other datasets or different classes, you may need to manually update the class names in the relevant scripts to match the classes in your dataset (such as `onnx_to_rknn.py`, `onnx_model_test.py`, `rknn_model_test.py`, `transfer.cpp` & `realtime_demo.cpp`).
 
 ---
 
