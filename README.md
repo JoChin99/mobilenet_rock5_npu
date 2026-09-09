@@ -234,3 +234,7 @@ mobilenet_rock5/
 |── transfer.cpp                # Transfer learning
 |── LICENSE
 ``` 
+
+## Credits
+- Jui Ning Chin
+- Bernd Porr
