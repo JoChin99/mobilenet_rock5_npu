@@ -240,5 +240,6 @@ mobilenet_rock5/
 - Bernd Porr
 
 The project has been adapted from Bernd Porr's original ExecuTorch MobileNet code. The original implementation and related code can be found here:
+
 https://github.com/berndporr/mobilenet_executorch.git
 
